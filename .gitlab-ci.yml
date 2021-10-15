@@ -83,9 +83,6 @@ go_unit_test:
   stage: unit_test
   dependencies: [ ]
   needs: [ ]
-  except:
-    changes:
-      - !reference [ build, except, changes ]
   before_script:
     - !reference [ default, before_script ]
     - go install github.com/boumenot/gocover-cobertura@latest
