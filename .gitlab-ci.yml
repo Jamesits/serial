@@ -1,0 +1,132 @@
+variables:
+  GIT_DEPTH: "2"
+  GIT_SUBMODULE_STRATEGY: recursive
+  TRANSFER_METER_FREQUENCY: "10s"
+  ARTIFACT_COMPRESSION_LEVEL: "slowest"
+  CACHE_COMPRESSION_LEVEL: "slowest"
+  FF_USE_FASTZIP: "true"
+  FF_SCRIPT_SECTIONS: "true"
+  FF_ENABLE_JOB_CLEANUP: "true" # https://gitlab.com/gitlab-org/gitlab-runner/-/issues/3856
+
+stages:
+  - static_analyze
+  - build_prerequisities
+  - unit_test
+  - build_cmds
+
+default:
+  # tags:
+  #   - os::linux
+  #   - env::docker
+  #   - net::outside
+  before_script:
+    - uname -a
+    - cat /etc/os-release
+    - date --utc +%s
+    - pwd
+    - export PATH="${HOME}/go/bin:${PATH}"
+  after_script: # note: after_script spawns a new shell
+    - export PATH="${HOME}/go/bin:${PATH}"
+    - date --utc +%s
+  image:
+    name: "golang:1.17"
+    entrypoint: [ "" ]
+
+include:
+  - template: Security/SAST.gitlab-ci.yml
+  - template: Dependency-Scanning.gitlab-ci.yml
+  - template: Security/Secret-Detection.gitlab-ci.yml
+  - template: Security/License-Scanning.gitlab-ci.yml
+
+sast:
+  stage: static_analyze
+  dependencies: [ ]
+  needs: [ ]
+
+dependency_scanning:
+  stage: static_analyze
+  dependencies: [ ]
+  needs: [ ]
+
+secret_detection:
+  stage: static_analyze
+  dependencies: [ ]
+  needs: [ ]
+  variables:
+    SECRET_DETECTION_HISTORIC_SCAN: "true"
+    GIT_SUBMODULE_STRATEGY: "none"
+
+secret_detection_default_branch:
+  stage: static_analyze
+  dependencies: [ ]
+  needs: [ ]
+  variables:
+    SECRET_DETECTION_HISTORIC_SCAN: "true"
+    GIT_SUBMODULE_STRATEGY: "none"
+
+# Note: the git software in license_scanning docker image does not come
+# with `git-submodule`, so we do not clone submodules.
+license_scanning:
+  stage: static_analyze
+  dependencies: [ ]
+  needs: [ ]
+  variables:
+    GIT_SUBMODULE_STRATEGY: "none"
+
+go_mod_verify:
+  stage: unit_test
+  needs:
+    - job: protobuf_build
+      artifacts: true
+  script:
+    - go mod vendor
+    - go mod graph
+    - go mod tidy
+    - go mod verify
+  artifacts:
+    when: always
+    paths:
+      - vendor/
+  allow_failure: false
+
+go_unit_test:
+  stage: unit_test
+  needs:
+    - job: protobuf_build
+      artifacts: true
+  before_script:
+    - !reference [default, before_script]
+    - go install github.com/boumenot/gocover-cobertura@latest
+  script:
+    - go test -v -coverprofile="coverage.txt" -covermode count $(go list ./...) && RET=0 || RET=1
+    - gocover-cobertura < coverage.txt > coverage.xml
+    - exit "$RET"
+  artifacts:
+    when: always
+    reports:
+      cobertura: coverage.xml
+  allow_failure: false
+
+build:
+  stage: build_cmds
+  needs:
+    - job: protobuf_build
+      artifacts: true
+  before_script:
+    - !reference [default, before_script]
+    - mkdir -p build
+    - go version
+  script:
+    - find cmd/ -mindepth 1 -maxdepth 1 -type d -print0 | while IFS= read -r -d '' line; do go build -o 'build/' -ldflags='-s -w' "github.com/Jamesits/serial/$line"; done
+  artifacts:
+    when: always
+    paths:
+      - "build/*"
+  parallel:
+    matrix:
+      - GOOS: linux
+        GOARCH: [ amd64, arm64, riscv64 ]
+      - GOOS: windows
+        GOARCH: [ amd64, "386", arm64 ]
+      - GOOS: darwin
+        GOARCH: [ amd64, arm64 ]
