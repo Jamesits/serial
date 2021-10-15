@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="serial open \\.\COM3 (Windows)" type="GoApplicationRunConfiguration" factoryName="Go Application">
+    <module name="serial" />
+    <working_directory value="$PROJECT_DIR$" />
+    <parameters value="open \\.\COM5" />
+    <kind value="PACKAGE" />
+    <package value="github.com/Jamesits/serial/cmd/serial" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$" />
+    <method v="2" />
+  </configuration>
+</component>
