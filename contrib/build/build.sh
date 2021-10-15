@@ -28,24 +28,20 @@ go mod verify
 
 # build
 find cmd/ -mindepth 1 -maxdepth 1 -type d -print0 | while IFS= read -r -d '' line; do
+  echo "Compiling $line..."
   go build -ldflags "-s -w -X \"main.versionGitCommitHash=$GIT_COMMIT\" -X \"main.versionCompileTime=$CURRENT_TIME\" -X \"main.versionCompileHost=$COMPILE_HOST\" -X \"main.versionGitStatus=$GIT_STATUS\"" -o "build/" "github.com/Jamesits/serial/$line"
 done
 
+ls -alh build/
+
 # upx
 if command -v upx; then
-	! upx "build/$OUT_FILE"
+	! upx "build/"*
 else
 	echo "UPX not installed, compression skipped"
 fi
 
-# root required
-! setcap 'cap_net_bind_service=+ep' "build/$OUT_FILE"
-
-ls -lh "build/$OUT_FILE"
-
-# test the binary
-# might fail in case of a cross compilation
-! ./"build/$OUT_FILE" -version
+ls -alh build/
 
 # set exit code even if the previous command fails
 exit 0
