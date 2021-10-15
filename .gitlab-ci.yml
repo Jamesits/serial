@@ -7,6 +7,7 @@ variables:
   FF_USE_FASTZIP: "true"
   FF_SCRIPT_SECTIONS: "true"
   FF_ENABLE_JOB_CLEANUP: "true" # https://gitlab.com/gitlab-org/gitlab-runner/-/issues/3856
+  DEBIAN_FRONTEND: noninteractive
 
 stages:
   - static_analyze
@@ -65,6 +66,8 @@ license_scanning:
 
 go_mod_verify:
   stage: unit_test
+  dependencies: [ ]
+  needs: [ ]
   script:
     - go mod vendor
     - go mod graph
@@ -78,8 +81,13 @@ go_mod_verify:
 
 go_unit_test:
   stage: unit_test
+  dependencies: [ ]
+  needs: [ ]
+  except:
+    changes:
+      - !reference [ build, except, changes ]
   before_script:
-    - !reference [default, before_script]
+    - !reference [ default, before_script ]
     - go install github.com/boumenot/gocover-cobertura@latest
   script:
     - go test -v -coverprofile="coverage.txt" -covermode count $(go list ./...) && RET=0 || RET=1
@@ -93,15 +101,26 @@ go_unit_test:
 
 build:
   stage: build_cmds
+  dependencies: [ ]
+  needs: [ ]
+  except:
+    changes:
+      - "README.md"
+      - "LICENSE"
+      - ".github/*"
+      - "examples/*"
+      - ".golangci.yml"
+      - "azure-pipelines.yaml"
+      - ".idea/*"
+      - "doc/*"
   before_script:
-    - !reference [default, before_script]
+    - !reference [ default, before_script ]
     - apt-get update -y
     - apt-get install -y upx
     - mkdir -p build
     - go version
   script:
-    - find cmd/ -mindepth 1 -maxdepth 1 -type d -print0 | while IFS= read -r -d '' line; do go build -o 'build/' -ldflags='-s -w' "github.com/Jamesits/serial/$line"; done
-    - upx build/* || true
+    - bash ./contrib/build/build.sh
   artifacts:
     when: always
     paths:

@@ -1,0 +1,85 @@
+name: $(SourceBranchName)-$(Date:yyyyMMdd).$(Rev:r)
+variables:
+  GOVER: '1.17.2'
+
+trigger:
+  batch: true
+  branches:
+    include: [ "master", "develop" ]
+  paths:
+    exclude: [ "README.md", "LICENSE", ".github/*", "examples/*", ".golangci.yml", ".gitlab-ci.yml", ".idea/*", "doc/*" ]
+
+pr:
+  autoCancel: true
+  branches:
+    include: [ "master", "develop" ]
+  paths:
+    exclude: [ "README.md", "LICENSE", ".github/*", "examples/*", ".golangci.yml", ".gitlab-ci.yml", ".idea/*", "doc/*" ]
+
+jobs:
+  - job: binary
+    displayName: "binary build"
+    pool:
+      vmImage: "ubuntu-latest"
+    workspace:
+      clean: all
+    timeoutInMinutes: 30
+
+    strategy:
+      matrix:
+        linux-amd64:
+          GOOS: 'linux'
+          GOARCH: 'amd64'
+          FILENAME_SUFFIX: ''
+        linux-arm64:
+          GOOS: 'linux'
+          GOARCH: 'arm64'
+          FILENAME_SUFFIX: ''
+        linux-riscv64:
+          GOOS: 'linux'
+          GOARCH: 'riscv64'
+          FILENAME_SUFFIX: ''
+        windows-amd64:
+          GOOS: 'windows'
+          GOARCH: 'amd64'
+          FILENAME_SUFFIX: '.exe'
+        windows-i386:
+          GOOS: 'windows'
+          GOARCH: '386'
+          FILENAME_SUFFIX: '.exe'
+        windows-arm64:
+          GOOS: 'windows'
+          GOARCH: 'arm64'
+          FILENAME_SUFFIX: '.exe'
+        darwin-amd64:
+          GOOS: 'darwin'
+          GOARCH: 'amd64'
+          FILENAME_SUFFIX: ''
+        darwin-arm64:
+          GOOS: 'darwin'
+          GOARCH: 'arm64'
+          FILENAME_SUFFIX: ''
+
+    steps:
+      - task: GoTool@0
+        displayName: 'Use Go'
+        inputs:
+          version: $(GOVER)
+
+      - bash: |
+          export DEBIAN_FRONTEND=noninteractive
+          sudo apt-get update
+          sudo apt-get install -y upx
+        displayName: 'Install Dependencies'
+      - bash: |
+          export GOPATH="/tmp/go"
+          export GOBIN="/opt/hostedtoolcache/go/${GOVER}/x64/bin"
+          export OUT_FILE="serial-${GOOS}-${GOARCH}${FILENAME_SUFFIX}"
+          bash ./contrib/build/build.sh
+          cp build/* ${BUILD_ARTIFACTSTAGINGDIRECTORY}
+        displayName: 'Build'
+
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish Artifact'
+        inputs:
+          ArtifactName: 'serial-$(GOOS)-$(GOARCH)'
