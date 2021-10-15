@@ -34,9 +34,9 @@ default:
 
 include:
   - template: Security/SAST.gitlab-ci.yml
-  - template: Dependency-Scanning.gitlab-ci.yml
-  - template: Security/Secret-Detection.gitlab-ci.yml
+  - template: Security/Dependency-Scanning.gitlab-ci.yml
   - template: Security/License-Scanning.gitlab-ci.yml
+  - template: Security/Secret-Detection.gitlab-ci.yml
 
 sast:
   stage: static_analyze
@@ -50,16 +50,6 @@ dependency_scanning:
 
 secret_detection:
   stage: static_analyze
-  dependencies: [ ]
-  needs: [ ]
-  variables:
-    SECRET_DETECTION_HISTORIC_SCAN: "true"
-    GIT_SUBMODULE_STRATEGY: "none"
-
-secret_detection_default_branch:
-  stage: static_analyze
-  dependencies: [ ]
-  needs: [ ]
   variables:
     SECRET_DETECTION_HISTORIC_SCAN: "true"
     GIT_SUBMODULE_STRATEGY: "none"
@@ -75,9 +65,6 @@ license_scanning:
 
 go_mod_verify:
   stage: unit_test
-  needs:
-    - job: protobuf_build
-      artifacts: true
   script:
     - go mod vendor
     - go mod graph
@@ -91,9 +78,6 @@ go_mod_verify:
 
 go_unit_test:
   stage: unit_test
-  needs:
-    - job: protobuf_build
-      artifacts: true
   before_script:
     - !reference [default, before_script]
     - go install github.com/boumenot/gocover-cobertura@latest
@@ -109,15 +93,15 @@ go_unit_test:
 
 build:
   stage: build_cmds
-  needs:
-    - job: protobuf_build
-      artifacts: true
   before_script:
     - !reference [default, before_script]
+    - apt-get update -y
+    - apt-get install -y upx
     - mkdir -p build
     - go version
   script:
     - find cmd/ -mindepth 1 -maxdepth 1 -type d -print0 | while IFS= read -r -d '' line; do go build -o 'build/' -ldflags='-s -w' "github.com/Jamesits/serial/$line"; done
+    - upx build/* || true
   artifacts:
     when: always
     paths:
