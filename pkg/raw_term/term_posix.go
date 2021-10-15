@@ -57,7 +57,7 @@ var origin syscall.Termios
 
 func SetRaw() {
 	t := getTermios(os.Stdin.Fd())
-	origin = &t
+	origin = *t
 
 	setRaw(t)
 	setTermios(os.Stdin.Fd(), t)
