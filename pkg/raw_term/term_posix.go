@@ -1,9 +1,12 @@
+//go:build darwin || linux
 // +build darwin linux
+
 // https://gist.github.com/EddieIvan01/4449b64fc1eb597ffc2f317cfa7cc70c
 
 package raw_term
 
 import (
+	log "github.com/sirupsen/logrus"
 	"os"
 	"syscall"
 	"unsafe"
@@ -50,11 +53,11 @@ func setRaw(term *syscall.Termios) {
 	term.Cc[syscall.VTIME] = 0
 }
 
-var origin *syscall.Termios
+var origin syscall.Termios
 
 func SetRaw() {
 	t := getTermios(os.Stdin.Fd())
-	origin = *t
+	origin = &t
 
 	setRaw(t)
 	setTermios(os.Stdin.Fd(), t)
