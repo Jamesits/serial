@@ -21,10 +21,16 @@ default:
   #   - env::docker
   #   - net::outside
   before_script:
+    # environment logging
+    - date --utc +%s
     - uname -a
     - cat /etc/os-release
-    - date --utc +%s
     - pwd
+    # sanity checks
+    - git version || true
+    - git submodule || true
+    - git lfs version || true
+    # setup for Golang (note: this only works for "script" but not "after_script"
     - export PATH="${HOME}/go/bin:${PATH}"
   after_script: # note: after_script spawns a new shell
     - export PATH="${HOME}/go/bin:${PATH}"
@@ -51,6 +57,8 @@ dependency_scanning:
 
 secret_detection:
   stage: static_analyze
+  dependencies: [ ]
+  needs: [ ]
   variables:
     SECRET_DETECTION_HISTORIC_SCAN: "true"
     GIT_SUBMODULE_STRATEGY: "none"
