@@ -15,7 +15,7 @@ Serial is a modern command-line serial port tool designed with both humans and m
 
 ## Features
 
-- Works entirely under a command line, no GUI required (even on Windows)
+- Works entirely under CLI, no GUI required (even on Windows)
 
 ## Usage
 
