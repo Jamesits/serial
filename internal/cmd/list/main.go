@@ -21,11 +21,13 @@ var CommandDefinition = &cobra.Command{
 var configPrint0 bool // print with "\0" as the separator; useful when running with Linux philosophy
 var configPrintFormat string
 var configPrintSerializeWrapInObject bool
+var configPrintSerializeDoNotPretty bool
 
 func init() {
 	CommandDefinition.PersistentFlags().BoolVar(&configPrint0, "print0", false, "Use '\\0' as the separator")
 	CommandDefinition.PersistentFlags().StringVar(&configPrintFormat, "format", "simple", "Print detailed information in the specified format (supported formats: table, json, csv)")
 	CommandDefinition.PersistentFlags().BoolVar(&configPrintSerializeWrapInObject, "json-wrap-in-object", false, "JSON: Wrap the array in an object (a compatibility option for some weak JSON parsers)")
+	CommandDefinition.PersistentFlags().BoolVar(&configPrintSerializeDoNotPretty, "json-do-not-pretty", false, "JSON: Do not pretty print")
 }
 
 func main(cmd *cobra.Command, args []string) error {
@@ -45,8 +47,11 @@ func main(cmd *cobra.Command, args []string) error {
 	case "simple":
 		fmt.Print(strings.Join(serialPortList, separator))
 
-	case "detail", "detailed", "table":
+	case "table":
 		formatTable()
+
+	case "detail", "detailed", "table-wide":
+		formatTableWide()
 
 	case "json":
 		var d interface{}
@@ -58,7 +63,11 @@ func main(cmd *cobra.Command, args []string) error {
 			d = getPortDetail()
 		}
 		return portDetailDump(d, func(d interface{}) ([]byte, error) {
-			return json.MarshalIndent(d, "", "    ")
+			if configPrintSerializeDoNotPretty {
+				return json.Marshal(d)
+			} else {
+				return json.MarshalIndent(d, "", "    ")
+			}
 		})
 
 	case "csv":
