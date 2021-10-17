@@ -78,12 +78,13 @@ go_mod_verify:
   needs: [ ]
   script:
     - go mod vendor
-    - go mod graph
+    - go mod graph | tee go-mod-graph.txt
     - go mod tidy
     - go mod verify
   artifacts:
     when: always
     paths:
+      - go-mod-graph.txt
       - vendor/
   allow_failure: false
 
