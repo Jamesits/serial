@@ -3,9 +3,11 @@ package open
 import (
 	"github.com/Jamesits/serial/pkg/console"
 	"github.com/Jamesits/serial/pkg/panic_helper"
+	"github.com/mattn/go-isatty"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"go.bug.st/serial"
+	"os"
 	"strings"
 	"sync"
 )
@@ -88,21 +90,41 @@ func main(cmd *cobra.Command, args []string) error {
 		return ErrorUnknownConfig
 	}
 
+	// setup I/O
 	var in chan<- []byte
 	var out <-chan []byte
 	err = nil
-	for _, console := range console.AvailableConsoleTypes {
-		in, out, err = console()
-		if err == nil {
-			break
-		} else {
-			log.WithError(err).Debugln("unable to initialize console type %v", console)
-		}
+
+	var stdinIsATerminal = true
+	if isatty.IsTerminal(os.Stdin.Fd()) {
+		log.Debugln("stdin is a terminal")
+	} else if isatty.IsCygwinTerminal(os.Stdout.Fd()) {
+		log.Debugln("stdin is a terminal")
+	} else {
+		stdinIsATerminal = false
+		log.Debugln("stdin is not a terminal")
 	}
-	if err != nil {
-		log.Errorln("no console options available")
-		return err
+
+	if stdinIsATerminal {
+		out, err = console.StdinRaw()
+	} else {
+		// ???
 	}
+
+	in, err = console.StdoutCooked(os.Stdout)
+
+	//for _, console := range console.AvailableConsoleTypes {
+	//	in, out, err = console()
+	//	if err == nil {
+	//		break
+	//	} else {
+	//		log.WithError(err).Debugln("unable to initialize console type %v", console)
+	//	}
+	//}
+	//if err != nil {
+	//	log.Errorln("no console options available")
+	//	return err
+	//}
 
 	log.Tracef("opening serial port")
 	sp, err := serial.Open(args[0], &serialMode)

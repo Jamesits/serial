@@ -2,6 +2,7 @@
 // +build darwin linux
 
 // https://gist.github.com/EddieIvan01/4449b64fc1eb597ffc2f317cfa7cc70c
+// https://viewsourcecode.org/snaptoken/kilo/02.enteringRawMode.html
 
 package raw_term
 
@@ -44,7 +45,7 @@ func setRaw(term *syscall.Termios) {
 	// This attempts to replicate the behaviour documented for cfmakeraw in
 	// the termios(3) manpage.
 	term.Iflag &^= syscall.IGNBRK | syscall.BRKINT | syscall.PARMRK | syscall.ISTRIP | syscall.INLCR | syscall.IGNCR | syscall.ICRNL | syscall.IXON
-	// newState.Oflag &^= syscall.OPOST
+	//term.Oflag &^= syscall.OPOST // turns off automatic CRLF transcoding
 	term.Lflag &^= syscall.ECHO | syscall.ECHONL | syscall.ICANON | syscall.ISIG | syscall.IEXTEN
 	term.Cflag &^= syscall.CSIZE | syscall.PARENB
 	term.Cflag |= syscall.CS8
