@@ -5,9 +5,10 @@ go 1.16
 require (
 	github.com/alessio/shellescape v1.4.1
 	github.com/containerd/console v1.0.3
+	github.com/jedib0t/go-pretty/v6 v6.2.4
 	github.com/jszwec/csvutil v1.5.1
 	github.com/mattn/go-colorable v0.1.6
-	github.com/mattn/go-isatty v0.0.14 // indirect
+	github.com/mattn/go-isatty v0.0.14
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/viper v1.9.0
