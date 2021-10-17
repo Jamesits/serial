@@ -31,6 +31,8 @@ func getTerminalWidth() int {
 var portSortLogicalClassifier = regexp.MustCompilePOSIX(`([[:alnum:]]+[[:alpha:]])([[:digit:]]+)$`)
 
 // sortPort can compare 2 port names in a logical method
+// Traditional sorting: "COM1", "COM11", "COM2"
+// Logical sorting: "COM1", "COM2", "COM11"
 func sortPort(portNameA string, portNameB string) bool {
 	matchA := portSortLogicalClassifier.FindStringSubmatch(portNameA)
 	matchB := portSortLogicalClassifier.FindStringSubmatch(portNameB)
