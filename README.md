@@ -1,6 +1,6 @@
 # Serial
 
-Serial port connector.
+Serial is a modern command-line serial port tool designed with both humans and machines in mind.
 
 **Work in progress, assume everything broken.**
 
@@ -23,8 +23,13 @@ Please use the in-program help system for a detailed list of the options availab
 
 ### Listing Ports
 
-```
+```shell
 serial list --format=table
+```
+
+The command output looks like this:
+
+```
 +---+-----------+----------------------------+------+------+------+-----------+
 |   | PATH      | DISPLAY NAME               | USB? | VID  | PID  | SERIAL    |
 +---+-----------+----------------------------+------+------+------+-----------+
@@ -32,9 +37,11 @@ serial list --format=table
 | 2 | \\.\COM2  | Communications Port (COM2) | No   |      |      |           |
 | 3 | \\.\COM5  | USB Serial Device (COM5)   | Yes  | 05A6 | 0009 |           |
 | 4 | \\.\COM7  | USB-SERIAL CH340 (COM7)    | Yes  | 1A86 | 7523 |           |
-| 5 | \\.\COM11 | USB Serial Port (COM11)    | Yes  | 0403 | 6010 | FT4UE4H3B |
+| 5 | \\.\COM11 | USB Serial Port (COM11)    | Yes  | 0403 | 6010 | FTD114514 |
 +---+-----------+----------------------------+------+------+------+-----------+
 ```
+
+Machine-readable formats ('\0'-separated strings, JSON, CSV) are also available.
 
 ### Connecting to a Port
 
