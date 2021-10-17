@@ -4,7 +4,9 @@ import (
 	"github.com/jedib0t/go-pretty/v6/table"
 	"golang.org/x/term"
 	"os"
+	"regexp"
 	"sort"
+	"strconv"
 )
 
 const TerminalDefaultWidth int = 80
@@ -26,10 +28,44 @@ func getTerminalWidth() int {
 	}
 }
 
+var portSortLogicalClassifier = regexp.MustCompilePOSIX(`([[:alnum:]]+[[:alpha:]])([[:digit:]]+)$`)
+
+// sortPort can compare 2 port names in a logical method
+func sortPort(portNameA string, portNameB string) bool {
+	matchA := portSortLogicalClassifier.FindStringSubmatch(portNameA)
+	matchB := portSortLogicalClassifier.FindStringSubmatch(portNameB)
+
+	for {
+		if len(matchA) < 3 || len(matchB) < 3 {
+			break
+		}
+
+		numA, err := strconv.Atoi(matchA[2])
+		if err != nil {
+			break
+		}
+
+		numB, err := strconv.Atoi(matchB[2])
+		if err != nil {
+			break
+		}
+
+		// use logical order
+		if matchA[1] == matchB[1] {
+			return numA < numB
+		} else {
+			return matchA[1] < matchB[1]
+		}
+	}
+
+	// if either name is not in the format of "COM1" or "ttyUSB1" then fallback to the traditional order
+	return portNameA < portNameB
+}
+
 func formatTable() {
 	p := *getPortDetail()
 	sort.Slice(p, func(i int, j int) bool {
-		return p[i].Name < p[j].Name
+		return sortPort(p[i].Name, p[j].Name)
 	})
 
 	t := table.NewWriter()
@@ -56,7 +92,7 @@ func formatTable() {
 func formatTableWide() {
 	p := *getPortDetail()
 	sort.Slice(p, func(i int, j int) bool {
-		return p[i].Name < p[j].Name
+		return sortPort(p[i].Name, p[j].Name)
 	})
 
 	t := table.NewWriter()
