@@ -4,7 +4,7 @@ Serial port connector.
 
 **Work in progress, assume everything broken.**
 
-## CI Status && Badges
+## CI Status & Badges
 
 | CI | Notes | Status |
 | :----- | :----- | :----- |

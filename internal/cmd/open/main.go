@@ -126,6 +126,13 @@ func main(cmd *cobra.Command, args []string) error {
 	//	return err
 	//}
 
+	// detect Windows named pipe
+	// TODO: this should be moved to a better place and the detection method to be verified
+	//if runtime.GOOS == "windows" && strings.HasPrefix(args[0], `\\.\pipe\`) {
+	//	pipe, err := winio.DialPipe(args[0], nil)
+	//
+	//}
+
 	log.Tracef("opening serial port")
 	sp, err := serial.Open(args[0], &serialMode)
 	if err != nil {

@@ -3,6 +3,7 @@ module github.com/Jamesits/serial
 go 1.16
 
 require (
+	github.com/Microsoft/go-winio v0.5.1 // indirect
 	github.com/alessio/shellescape v1.4.1
 	github.com/containerd/console v1.0.3
 	github.com/jedib0t/go-pretty/v6 v6.2.4
