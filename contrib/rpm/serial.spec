@@ -11,13 +11,12 @@ BuildRequires:  golang
 Provides:       %{name} = %{version}
 
 %description
-A simple web app
+Serial is a modern command-line serial port tool designed with both humans and machines in mind.
 
 %global debug_package %{nil}
 
 %prep
 %autosetup
-
 
 %build
 bash contrib/build/build.sh
