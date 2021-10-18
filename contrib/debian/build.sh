@@ -10,7 +10,7 @@ declare -a GO_MANUAL_DEPS=(
 )
 
 if [ ! -d "/var/cache/pbuilder/base.cow" ]; then
-  cowbuilder --create
+  sudo cowbuilder --create
 fi
 
 pushd /tmp

@@ -121,7 +121,6 @@ jobs:
         inputs:
           ArtifactName: 'serial-archlinux-amd64'
 
-
   - job: archlinux
     displayName: "packaging archlinux"
     pool:
@@ -151,3 +150,34 @@ jobs:
         displayName: 'Publish Artifact'
         inputs:
           ArtifactName: 'serial-archlinux-amd64'
+
+  - job: fedora
+    displayName: "packaging fedora"
+    pool:
+      vmImage: "ubuntu-latest"
+    container:
+      image: "fedora:latest"
+      options: "--name ci-container -v /usr/bin/docker:/tmp/docker:ro"
+    workspace:
+      clean: all
+    timeoutInMinutes: 30
+    steps:
+      - bash: |
+          /tmp/docker exec -t -u 0 ci-container \
+          sh -c "dnf update; yes | dnf install sudo"
+        displayName: 'Install sudo'
+
+      - bash: |
+          yes | sudo dnf group install "Development Tools"
+          yes | sudo dnf install go
+        displayName: 'Install Dependencies'
+
+      - bash: |
+          bash contrib/rpm/build.sh
+          cp "${HOME}/rpmbuild/RPMS/"**/* "${BUILD_ARTIFACTSTAGINGDIRECTORY}"
+        displayName: 'Build'
+
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish Artifact'
+        inputs:
+          ArtifactName: 'serial-fedora-amd64'
