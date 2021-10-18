@@ -89,7 +89,7 @@ jobs:
     pool:
       vmImage: "ubuntu-latest"
     container:
-      image: "debian:11-slim"
+      image: "debian:sid"
       options: "--name ci-container -v /usr/bin/docker:/tmp/docker:ro"
     workspace:
       clean: all

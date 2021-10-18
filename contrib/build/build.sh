@@ -32,7 +32,7 @@ go mod download
 go mod verify
 
 # build
-go build -mod=readonly -modcacherw -buildmode=pie -trimpath -ldflags "-linkmode=external -s -w -X \"main.versionGitCommitHash=$GIT_COMMIT\" -X \"main.versionCompileTime=$CURRENT_TIME\" -X \"main.versionCompileHost=$COMPILE_HOST\" -X \"main.versionGitStatus=$GIT_STATUS\"" -o "build/" ./cmd/...
+go build -mod=readonly -modcacherw -trimpath -ldflags "-s -w -X \"main.versionGitCommitHash=$GIT_COMMIT\" -X \"main.versionCompileTime=$CURRENT_TIME\" -X \"main.versionCompileHost=$COMPILE_HOST\" -X \"main.versionGitStatus=$GIT_STATUS\"" -o "build/" ./cmd/...
 ls -alh build/
 
 # upx
