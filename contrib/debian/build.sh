@@ -37,7 +37,7 @@ for pkg in "${GO_MANUAL_DEPS[@]}"; do
   dpkg-buildpackage --build=binary --no-sign
 
   # collect artifacts
-  find .. -type f -maxdepth 1 -exec mv -v -- \{\} /tmp/artifacts \;
+  find .. -type f -maxdepth 1 -exec cp -afv -- \{\} /tmp/artifacts \;
 
   # install artifacts
   sudo dpkg -i ../*.deb
@@ -65,4 +65,4 @@ mk-build-deps --root-cmd sudo --install --tool "apt-get -o Debug::pkgProblemReso
 dpkg-buildpackage --build=binary --no-sign
 
 # collect artifacts
-find .. -type f -maxdepth 1 -exec mv -v -- \{\} /tmp/artifacts \;
+find .. -type f -maxdepth 1 -exec cp -afv -- \{\} /tmp/artifacts \;
