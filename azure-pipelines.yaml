@@ -89,11 +89,19 @@ jobs:
     pool:
       vmImage: "ubuntu-latest"
     container:
-      image: "debian:sid"
+      image: "debian:$IMAGE_TAG"
       options: "--name ci-container -v /usr/bin/docker:/tmp/docker:ro"
     workspace:
       clean: all
     timeoutInMinutes: 30
+
+    strategy:
+      matrix:
+        bullseye-amd64:
+          IMAGE_TAG: 'bullseye-backports'
+        bookworm-amd64:
+          IMAGE_TAG: 'bookworm'
+
     steps:
       # https://github.com/microsoft/azure-pipelines-agent/issues/2043#issuecomment-687983301
       - bash: |
@@ -118,7 +126,9 @@ jobs:
           cp -afv contrib/debian .
 
           mk-build-deps --root-cmd sudo --install --tool "apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends -y"
-          dpkg-buildpackage --build=full --no-sign
+          dpkg-buildpackage --build=binary --no-sign
+
+          ls -alh . ..
         displayName: 'Build'
 
   - job: archlinux
@@ -138,7 +148,7 @@ jobs:
         displayName: 'Install sudo'
 
       - bash: |
-          sudo pacman -S --noconfirm pacman-contrib binutils go upx
+          sudo pacman -S --noconfirm pacman-contrib binutils go git upx
         displayName: 'Install Dependencies'
 
       - bash: |
@@ -148,5 +158,5 @@ jobs:
           cd /tmp/archlinux
           updpkgsums
           makepkg
-          ls -alh
+          ls -alh . ..
         displayName: 'Build'
