@@ -84,23 +84,16 @@ jobs:
         inputs:
           ArtifactName: 'serial-$(GOOS)-$(GOARCH)'
 
-  - job: debian
-    displayName: "deb"
+  - job: debian_10
+    displayName: "packaging debian-bullseye"
     pool:
       vmImage: "ubuntu-latest"
     container:
-      image: "debian:$IMAGE_TAG"
+      image: "debian:bullseye-backports"
       options: "--name ci-container -v /usr/bin/docker:/tmp/docker:ro"
     workspace:
       clean: all
     timeoutInMinutes: 30
-
-    strategy:
-      matrix:
-        bullseye-amd64:
-          IMAGE_TAG: 'bullseye-backports'
-        bookworm-amd64:
-          IMAGE_TAG: 'bookworm'
 
     steps:
       # https://github.com/microsoft/azure-pipelines-agent/issues/2043#issuecomment-687983301
@@ -132,7 +125,7 @@ jobs:
         displayName: 'Build'
 
   - job: archlinux
-    displayName: "arch"
+    displayName: "packaging archlinux"
     pool:
       vmImage: "ubuntu-latest"
     container:

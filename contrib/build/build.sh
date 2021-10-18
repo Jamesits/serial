@@ -15,7 +15,7 @@ export CGO_LDFLAGS="${LDFLAGS:-}"
 
 GIT_COMMIT=$(git rev-list -1 HEAD | cut -c -8)
 CURRENT_TIME=$(date -u "+%Y-%m-%d %T UTC")
-COMPILE_HOST=$(hostname --fqdn)
+COMPILE_HOST=$(cat /proc/sys/kernel/hostname)
 GIT_STATUS=""
 if output=$(git status --porcelain) && [ -z "$output" ]; then
 	GIT_STATUS="clean"
