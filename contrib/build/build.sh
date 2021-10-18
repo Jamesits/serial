@@ -27,7 +27,7 @@ mkdir -p build
 
 # go get -d ./...
 export GO111MODULE=on
-go mod download -x
+go mod download
 go mod verify
 
 # build
