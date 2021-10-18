@@ -40,11 +40,11 @@ for pkg in "${GO_MANUAL_DEPS[@]}"; do
   find .. -type f -maxdepth 1 -exec mv -v -- \{\} /tmp/artifacts \;
   popd
   popd
-
-  # install artifacts
-  sudo dpkg -i /tmp/artifacts/*.deb
 done
 popd
+
+# install artifacts
+sudo dpkg -i /tmp/artifacts/*.deb
 
 # generate debian control files
 pushd /tmp
