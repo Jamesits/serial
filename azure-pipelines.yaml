@@ -83,3 +83,47 @@ jobs:
         displayName: 'Publish Artifact'
         inputs:
           ArtifactName: 'serial-$(GOOS)-$(GOARCH)'
+
+  - job: packaging-debian
+    displayName: "deb"
+    pool:
+      vmImage: "ubuntu-latest"
+    container: "debian:11-slim"
+    workspace:
+      clean: all
+    timeoutInMinutes: 30
+    steps:
+      - bash: |
+          export DEBIAN_FRONTEND=noninteractive
+          sudo apt-get update
+          sudo apt-get install -y devscripts
+        displayName: 'Install Dependencies'
+
+      - bash: |
+          ln -s contrib/debian debian
+          dpkg-buildpackage --build=full --no-sign
+        displayName: 'Build'
+
+  - job: packaging-archlinux
+    displayName: "arch"
+    pool:
+      vmImage: "ubuntu-latest"
+    container: "archlinux:latest"
+    workspace:
+      clean: all
+    timeoutInMinutes: 30
+    steps:
+      - bash: |
+          pacman -Syyu --noconfirm
+          pacman -S --noconfirm pacman-contrib
+        displayName: 'Install Dependencies'
+
+      - bash: |
+          mkdir /tmp/archlinux
+          tar -cvJf /tmp/archlinux/source.tar.xz .
+          cp -rv contrib/archlinux/* /tmp/archlinux/
+          cd /tmp/archlinux
+          updpkgsums
+          makepkg
+          ls -alh
+        displayName: 'Build'
