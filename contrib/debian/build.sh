@@ -41,6 +41,7 @@ for pkg in "${GO_MANUAL_DEPS[@]}"; do
 
   # install artifacts
   sudo dpkg -i ../*.deb
+  sudo apt-get install -fy || true
   popd
   popd
 done
