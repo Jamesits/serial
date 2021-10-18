@@ -42,7 +42,7 @@ for pkg in "${GO_MANUAL_DEPS[@]}"; do
   popd
 
   # install artifacts
-  sudo dpkg -i /tmp/artifacts/*.dpkg
+  sudo dpkg -i /tmp/artifacts/*.deb
 done
 popd
 
