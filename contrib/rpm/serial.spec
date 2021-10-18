@@ -7,7 +7,6 @@ License:        GPLv3
 Source0:        %{name}-%{version}.tar.gz
 
 BuildRequires:  golang
-BuildRequires:  systemd-rpm-macros
 
 Provides:       %{name} = %{version}
 
@@ -23,11 +22,8 @@ A simple web app
 %build
 bash contrib/build/build.sh
 
-
 %install
 install -Dpm 0755 build/%{name} %{buildroot}%{_bindir}/%{name}
-#install -Dpm 0755 config.json %{buildroot}%{_sysconfdir}/%{name}/config.json
-#install -Dpm 644 %{name}.service %{buildroot}%{_unitdir}/%{name}.service
 
 %check
 # go test should be here... :)
@@ -40,11 +36,7 @@ true
 #%systemd_preun %{name}.service
 
 %files
-#%dir %{_sysconfdir}/%{name}
 %{_bindir}/%{name}
-#%{_unitdir}/%{name}.service
-#%config(noreplace) %{_sysconfdir}/%{name}/config.json
-
 
 %changelog
 * Wed May 19 2021 John Doe - 1.0-1
