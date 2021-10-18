@@ -88,14 +88,21 @@ jobs:
     displayName: "deb"
     pool:
       vmImage: "ubuntu-latest"
-    container: "debian:11-slim"
+    container:
+      image: "debian:11-slim"
+      options: "--name ci-container -v /usr/bin/docker:/tmp/docker:ro"
     workspace:
       clean: all
     timeoutInMinutes: 30
     steps:
+      # https://github.com/microsoft/azure-pipelines-agent/issues/2043#issuecomment-687983301
+      - bash: |
+          /tmp/docker exec -t -u 0 ci-container \
+          sh -c "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confold" -y install sudo"
+        displayName: 'Install sudo'
+
       - bash: |
           export DEBIAN_FRONTEND=noninteractive
-          sudo apt-get update
           sudo apt-get install -y devscripts
         displayName: 'Install Dependencies'
 
@@ -108,14 +115,20 @@ jobs:
     displayName: "arch"
     pool:
       vmImage: "ubuntu-latest"
-    container: "archlinux:latest"
+    container:
+      image: "archlinux:latest"
+      options: "--name ci-container -v /usr/bin/docker:/tmp/docker:ro"
     workspace:
       clean: all
     timeoutInMinutes: 30
     steps:
       - bash: |
-          pacman -Syyu --noconfirm
-          pacman -S --noconfirm pacman-contrib
+          /tmp/docker exec -t -u 0 ci-container \
+          sh -c "pacman -Syyu --noconfirm; pacman -S --noconfirm sudo"
+        displayName: 'Install sudo'
+
+      - bash: |
+          sudo pacman -S --noconfirm pacman-contrib
         displayName: 'Install Dependencies'
 
       - bash: |
