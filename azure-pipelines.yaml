@@ -77,11 +77,14 @@ jobs:
           export GOBIN="/opt/hostedtoolcache/go/${GOVER}/x64/bin"
           export OUT_FILE="serial-${GOOS}-${GOARCH}${FILENAME_SUFFIX}"
           bash ./contrib/build/build.sh
-          cp build/* "${BUILD_ARTIFACTSTAGINGDIRECTORY}"
         displayName: 'Build'
 
+      - bash: |
+          cp build/* "${BUILD_ARTIFACTSTAGINGDIRECTORY}"
+        displayName: 'Copy Artifacts'
+
       - task: PublishBuildArtifacts@1
-        displayName: 'Publish Artifact'
+        displayName: 'Publish Artifacts'
         inputs:
           ArtifactName: 'serial-bin-$(GOOS)-$(GOARCH)'
 
@@ -112,12 +115,14 @@ jobs:
 
       - bash: |
           bash contrib/debian/build.sh
-
-          cp /tmp/artifacts/* "${BUILD_ARTIFACTSTAGINGDIRECTORY}"
         displayName: 'Build'
 
+      - bash: |
+          cp /tmp/artifacts/* "${BUILD_ARTIFACTSTAGINGDIRECTORY}"
+        displayName: 'Copy Artifacts'
+
       - task: PublishBuildArtifacts@1
-        displayName: 'Publish Artifact'
+        displayName: 'Publish Artifacts'
         inputs:
           ArtifactName: 'serial-pkg-debian10-amd64'
 
@@ -144,11 +149,14 @@ jobs:
 
       - bash: |
           bash contrib/archlinux/build.sh
-          cp -afv /tmp/archlinux/*.pkg.* "${BUILD_ARTIFACTSTAGINGDIRECTORY}"
         displayName: 'Build'
 
+      - bash: |
+          cp -afv /tmp/archlinux/*.pkg.* "${BUILD_ARTIFACTSTAGINGDIRECTORY}"
+        displayName: 'Copy Artifacts'
+
       - task: PublishBuildArtifacts@1
-        displayName: 'Publish Artifact'
+        displayName: 'Publish Artifacts'
         inputs:
           ArtifactName: 'serial-pkg-archlinux-amd64'
 
@@ -176,11 +184,14 @@ jobs:
 
       - bash: |
           bash contrib/rpm/build.sh
-          cp "${HOME}/rpmbuild/RPMS/"**/* "${BUILD_ARTIFACTSTAGINGDIRECTORY}"
         displayName: 'Build'
 
+      - bash: |
+          cp "${HOME}/rpmbuild/RPMS/"**/* "${BUILD_ARTIFACTSTAGINGDIRECTORY}"
+        displayName: 'Copy Artifacts'
+
       - task: PublishBuildArtifacts@1
-        displayName: 'Publish Artifact'
+        displayName: 'Publish Artifacts'
         inputs:
           ArtifactName: 'serial-pkg-fedora-amd64'
 
@@ -210,10 +221,13 @@ jobs:
 
       - bash: |
           bash contrib/rpm/build.sh
-          cp "${HOME}/rpmbuild/RPMS/"**/* "${BUILD_ARTIFACTSTAGINGDIRECTORY}"
         displayName: 'Build'
 
+      - bash: |
+          cp "${HOME}/rpmbuild/RPMS/"**/* "${BUILD_ARTIFACTSTAGINGDIRECTORY}"
+        displayName: 'Copy Artifacts'
+
       - task: PublishBuildArtifacts@1
-        displayName: 'Publish Artifact'
+        displayName: 'Publish Artifacts'
         inputs:
           ArtifactName: 'serial-pkg-centos7-amd64'
