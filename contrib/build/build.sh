@@ -1,7 +1,6 @@
 #!/bin/bash
 set -Eeuo pipefail
-
-cd "$( dirname "${BASH_SOURCE[0]}" )/../.."
+cd -- "$( dirname -- "${BASH_SOURCE[0]}" )/../.."
 
 # set GOROOT to the actual goroot, else you will have strange errors complaining cannot load bufio
 # fix GOPATH if it doesn't exist

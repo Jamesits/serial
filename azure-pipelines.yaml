@@ -110,42 +110,16 @@ jobs:
         displayName: 'Install Dependencies'
 
       - bash: |
-          set -Eeuo pipefail
-          set -x
-
-          pushd /tmp
-          for pkg in github.com/jszwec/csvutil go.bug.st/serial; do
-            rm -rf build || true
-            mkdir -p build
-            pushd build
-            dh-make-golang "$pkg"
-            ls -alh . ..
-            pushd */
-            git commit -m "add debian packaging metadata"
-            gbp buildpackage --git-pbuilder
-            ls -alh . ..
-            popd
-            popd
-          done
-          popd
-        displayName: 'Build Dependencies'
-
-      - bash: |
-          set -Eeuo pipefail
-          set -x
-
-          pushd /tmp
-          dh-make-golang github.com/Jamesits/serial
-          popd
-
-          cp -afv /tmp/serial/debian .
-          cp -afv contrib/debian .
-
-          mk-build-deps --root-cmd sudo --install --tool "apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends -y"
-          dpkg-buildpackage --build=binary --no-sign
+          bash contrib/debian/build.sh
 
           ls -alh . ..
         displayName: 'Build'
+
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish Artifact'
+        inputs:
+          ArtifactName: 'serial-archlinux-amd64'
+
 
   - job: archlinux
     displayName: "packaging archlinux"
@@ -168,16 +142,7 @@ jobs:
         displayName: 'Install Dependencies'
 
       - bash: |
-          set -Eeuo pipefail
-
-          mkdir /tmp/archlinux
-          tar -cvJf /tmp/archlinux/source.tar.xz .
-          cp -rv contrib/archlinux/* /tmp/archlinux/
-          cd /tmp/archlinux
-          updpkgsums
-
-          makepkg
-
+          bash contrib/archlinux/build.sh
           cp -afv /tmp/archlinux/*.pkg.* "${BUILD_ARTIFACTSTAGINGDIRECTORY}"
         displayName: 'Build'
 
