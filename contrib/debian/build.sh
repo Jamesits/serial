@@ -9,9 +9,9 @@ declare -a GO_MANUAL_DEPS=(
   "go.bug.st/serial"
 )
 
-if [ ! -d "/var/cache/pbuilder/base.cow" ]; then
-  sudo cowbuilder --create
-fi
+#if [ ! -d "/var/cache/pbuilder/base.cow" ]; then
+#  sudo cowbuilder --create
+#fi
 
 pushd /tmp
 for pkg in "${GO_MANUAL_DEPS[@]}"; do
@@ -23,7 +23,8 @@ for pkg in "${GO_MANUAL_DEPS[@]}"; do
   pushd */
   git add .
   git commit -m "add debian packaging metadata"
-  gbp buildpackage --git-pbuilder
+#  gbp buildpackage --git-pbuilder
+  dpkg-buildpackage --build=binary --no-sign
   ls -alh . ..
   popd
   popd
