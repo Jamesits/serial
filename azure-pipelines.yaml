@@ -104,6 +104,7 @@ jobs:
 
       - bash: |
           export DEBIAN_FRONTEND=noninteractive
+          sudo apt-get purge -y man-db
           sudo apt-get install -y devscripts equivs dh-make-golang
           git config --global user.name "buildbot"
           git config --global user.email "buildbot@example.com"

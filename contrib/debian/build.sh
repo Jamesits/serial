@@ -9,6 +9,10 @@ declare -a GO_MANUAL_DEPS=(
   "go.bug.st/serial"
 )
 
+if [ ! -d "/var/cache/pbuilder/base.cow" ]; then
+  cowbuilder --create
+fi
+
 pushd /tmp
 for pkg in "${GO_MANUAL_DEPS[@]}"; do
   rm -rf build || true
