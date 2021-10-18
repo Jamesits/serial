@@ -13,30 +13,51 @@ declare -a GO_MANUAL_DEPS=(
 #  sudo cowbuilder --create
 #fi
 
+mkdir -p /tmp/artifacts
+
 pushd /tmp
 for pkg in "${GO_MANUAL_DEPS[@]}"; do
+  # setup build directory
   rm -rf build || true
   mkdir -p build
   pushd build
-  dh-make-golang "$pkg"
-  ls -alh . ..
+
+  # generate debian control files
+  dh-make-golang -allow_unknown_hoster "$pkg"
   pushd */
-  git add .
-  git commit -m "add debian packaging metadata"
-#  gbp buildpackage --git-pbuilder
+  # git add .
+  # git commit -m "add debian packaging metadata"
+
+  # install dependencies
+  mk-build-deps --root-cmd sudo --install --tool "apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends -y"
+
+  # build
+  # gbp buildpackage --git-pbuilder
   dpkg-buildpackage --build=binary --no-sign
-  ls -alh . ..
+
+  # collect artifacts
+  find .. -type f -maxdepth 1 -exec mv -v -- \{\} /tmp/artifacts \;
   popd
   popd
 done
 popd
 
+sudo dpkg -i /tmp/artifacts/*.dpkg
+
+# generate debian control files
 pushd /tmp
 dh-make-golang github.com/Jamesits/serial
 popd
 
+# overlay files
 cp -afv /tmp/serial/debian .
-cp -afv contrib/debian/overrides/* .
+cp -afv contrib/debian/overrides/* debian/
 
+# install dependencies
 mk-build-deps --root-cmd sudo --install --tool "apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends -y"
+
+# build
 dpkg-buildpackage --build=binary --no-sign
+
+# collect artifacts
+find .. -type f -maxdepth 1 -exec mv -v -- \{\} /tmp/artifacts \;
