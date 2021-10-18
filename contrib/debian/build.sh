@@ -17,6 +17,7 @@ for pkg in "${GO_MANUAL_DEPS[@]}"; do
   dh-make-golang "$pkg"
   ls -alh . ..
   pushd */
+  git add .
   git commit -m "add debian packaging metadata"
   gbp buildpackage --git-pbuilder
   ls -alh . ..
