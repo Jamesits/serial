@@ -110,13 +110,17 @@ jobs:
         displayName: 'Install Dependencies'
 
       - bash: |
+          set -Eeuo pipefail
+          set -x
+
           pushd /tmp
           for pkg in github.com/jszwec/csvutil go.bug.st/serial; do
             rm -rf build || true
             mkdir -p build
             pushd build
             dh-make-golang "$pkg"
-            pushd *
+            ls -alh . ..
+            pushd */
             git commit -m "add debian packaging metadata"
             gbp buildpackage --git-pbuilder
             ls -alh . ..
@@ -127,6 +131,9 @@ jobs:
         displayName: 'Build Dependencies'
 
       - bash: |
+          set -Eeuo pipefail
+          set -x
+
           pushd /tmp
           dh-make-golang github.com/Jamesits/serial
           popd
