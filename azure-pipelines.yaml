@@ -164,12 +164,12 @@ jobs:
     steps:
       - bash: |
           /tmp/docker exec -t -u 0 ci-container \
-          sh -c "dnf update; yes | dnf install sudo"
+          sh -c "dnf --assumeyes update; dnf --assumeyes install sudo"
         displayName: 'Install sudo'
 
       - bash: |
-          yes | sudo dnf group install "Development Tools"
-          yes | sudo dnf install go
+          sudo dnf --assumeyes group install "Development Tools"
+          sudo dnf --assumeyes install go
         displayName: 'Install Dependencies'
 
       - bash: |
