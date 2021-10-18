@@ -108,7 +108,7 @@ jobs:
 
       - bash: |
           ln -s contrib/debian debian
-          mk-build-deps --root-cmd sudo --install
+          mk-build-deps --root-cmd sudo --install --tool "apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends -y"
           dpkg-buildpackage --build=full --no-sign
         displayName: 'Build'
 
@@ -129,7 +129,7 @@ jobs:
         displayName: 'Install sudo'
 
       - bash: |
-          sudo pacman -S --noconfirm pacman-contrib binutils
+          sudo pacman -S --noconfirm pacman-contrib binutils go
         displayName: 'Install Dependencies'
 
       - bash: |
