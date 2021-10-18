@@ -142,7 +142,7 @@ jobs:
 
       - bash: |
           export DEBIAN_FRONTEND=noninteractive
-          sudo apt-get install -y devscripts equivs dh-make-golang dh-golang golang-any
+          sudo apt-get install -y devscripts equivs dh-make-golang dh-golang golang-any socat
           git config --global user.name "buildbot"
           git config --global user.email "buildbot@example.com"
         displayName: 'Install Dependencies'
