@@ -103,11 +103,12 @@ jobs:
 
       - bash: |
           export DEBIAN_FRONTEND=noninteractive
-          sudo apt-get install -y devscripts
+          sudo apt-get install -y devscripts equivs
         displayName: 'Install Dependencies'
 
       - bash: |
           ln -s contrib/debian debian
+          mk-build-deps --root-cmd sudo --install
           dpkg-buildpackage --build=full --no-sign
         displayName: 'Build'
 
@@ -128,7 +129,7 @@ jobs:
         displayName: 'Install sudo'
 
       - bash: |
-          sudo pacman -S --noconfirm pacman-contrib
+          sudo pacman -S --noconfirm pacman-contrib binutils
         displayName: 'Install Dependencies'
 
       - bash: |
