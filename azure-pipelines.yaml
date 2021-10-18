@@ -103,11 +103,17 @@ jobs:
 
       - bash: |
           export DEBIAN_FRONTEND=noninteractive
-          sudo apt-get install -y devscripts equivs
+          sudo apt-get install -y devscripts equivs dh-make-golang
         displayName: 'Install Dependencies'
 
       - bash: |
-          ln -s contrib/debian debian
+          pushd /tmp
+          dh-make-golang github.com/Jamesits/serial
+          popd
+
+          cp -afv /tmp/serial/debian .
+          cp -afv contrib/debian .
+
           mk-build-deps --root-cmd sudo --install --tool "apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends -y"
           dpkg-buildpackage --build=full --no-sign
         displayName: 'Build'
@@ -129,7 +135,7 @@ jobs:
         displayName: 'Install sudo'
 
       - bash: |
-          sudo pacman -S --noconfirm pacman-contrib binutils go
+          sudo pacman -S --noconfirm pacman-contrib binutils go upx
         displayName: 'Install Dependencies'
 
       - bash: |

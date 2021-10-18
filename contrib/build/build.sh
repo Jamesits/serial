@@ -8,6 +8,11 @@ cd "$( dirname "${BASH_SOURCE[0]}" )/../.."
 export GOPATH=${GOPATH:-/tmp/gopath}
 OUT_FILE=${OUT_FILE:-serial}
 
+export CGO_CPPFLAGS="${CPPFLAGS}"
+export CGO_CFLAGS="${CFLAGS}"
+export CGO_CXXFLAGS="${CXXFLAGS}"
+export CGO_LDFLAGS="${LDFLAGS}"
+
 GIT_COMMIT=$(git rev-list -1 HEAD | cut -c -8)
 CURRENT_TIME=$(date -u "+%Y-%m-%d %T UTC")
 COMPILE_HOST=$(hostname --fqdn)
@@ -27,11 +32,7 @@ go mod download
 go mod verify
 
 # build
-find cmd/ -mindepth 1 -maxdepth 1 -type d -print0 | while IFS= read -r -d '' line; do
-  echo "Compiling $line..."
-  go build -ldflags "-s -w -X \"main.versionGitCommitHash=$GIT_COMMIT\" -X \"main.versionCompileTime=$CURRENT_TIME\" -X \"main.versionCompileHost=$COMPILE_HOST\" -X \"main.versionGitStatus=$GIT_STATUS\"" -o "build/" "github.com/Jamesits/serial/$line"
-done
-
+go build -mod=readonly -modcacherw -buildmode=pie -trimpath -ldflags "-linkmode=external -s -w -X \"main.versionGitCommitHash=$GIT_COMMIT\" -X \"main.versionCompileTime=$CURRENT_TIME\" -X \"main.versionCompileHost=$COMPILE_HOST\" -X \"main.versionGitStatus=$GIT_STATUS\"" -o "build/" ./cmd/...
 ls -alh build/
 
 # upx
