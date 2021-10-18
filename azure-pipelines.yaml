@@ -119,6 +119,7 @@ jobs:
           cp -afv contrib/debian .
 
           mk-build-deps --root-cmd sudo --install --tool "apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends -y"
+          go mod download -x
           dpkg-buildpackage --build=binary --no-sign
 
           ls -alh . ..
@@ -141,7 +142,7 @@ jobs:
         displayName: 'Install sudo'
 
       - bash: |
-          sudo pacman -S --noconfirm pacman-contrib binutils go git upx
+          sudo pacman -S --noconfirm pacman-contrib binutils go git upx base-devel
         displayName: 'Install Dependencies'
 
       - bash: |
