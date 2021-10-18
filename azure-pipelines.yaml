@@ -84,7 +84,7 @@ jobs:
         inputs:
           ArtifactName: 'serial-$(GOOS)-$(GOARCH)'
 
-  - job: packaging-debian
+  - job: debian
     displayName: "deb"
     pool:
       vmImage: "ubuntu-latest"
@@ -104,7 +104,7 @@ jobs:
           dpkg-buildpackage --build=full --no-sign
         displayName: 'Build'
 
-  - job: packaging-archlinux
+  - job: archlinux
     displayName: "arch"
     pool:
       vmImage: "ubuntu-latest"
