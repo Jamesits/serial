@@ -248,10 +248,10 @@ jobs:
 
       - bash: |
           sudo yum -y install epel-release
-          rpm -U https://centos7.iuscommunity.org/ius-release.rpm
+          sudo rpm -U https://centos7.iuscommunity.org/ius-release.rpm
           sudo yum -y update
-          yum remove git
-          yum install git224
+          sudo yum -y remove git
+          sudo yum -y install git224
           sudo yum -y group install "Development Tools"
           sudo yum -y install golang rpmdevtools systemd-rpm-macros
         displayName: 'Install Dependencies'
