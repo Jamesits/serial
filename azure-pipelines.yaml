@@ -105,7 +105,7 @@ jobs:
       - bash: |
           export DEBIAN_FRONTEND=noninteractive
           sudo apt-get purge -y man-db
-          sudo apt-get install -y devscripts equivs dh-make-golang
+          sudo apt-get install -y devscripts equivs dh-make-golang dh-golang golang-any
           git config --global user.name "buildbot"
           git config --global user.email "buildbot@example.com"
         displayName: 'Install Dependencies'
@@ -169,7 +169,7 @@ jobs:
 
       - bash: |
           sudo dnf --assumeyes group install "Development Tools"
-          sudo dnf --assumeyes install go
+          sudo dnf --assumeyes install go rpmdevtools
         displayName: 'Install Dependencies'
 
       - bash: |
