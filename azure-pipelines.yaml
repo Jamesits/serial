@@ -17,6 +17,40 @@ pr:
     exclude: [ "README.md", "LICENSE", ".github/*", "examples/*", ".golangci.yml", ".gitlab-ci.yml", ".idea/*", "doc/*" ]
 
 jobs:
+  - job: unit_test_linux_amd64
+    displayName: "unit test linux-amd64"
+    pool:
+      vmImage: "ubuntu-latest"
+    workspace:
+      clean: all
+    timeoutInMinutes: 30
+
+  - job: unit_test_windows_amd64
+    displayName: "unit test windows-amd64"
+    pool:
+      vmImage: "windows-latest"
+    workspace:
+      clean: all
+    timeoutInMinutes: 30
+
+  - job: unit_test_macos_amd64
+    displayName: "unit test macos-amd64"
+    pool:
+      vmImage: "macos-latest"
+    workspace:
+      clean: all
+    timeoutInMinutes: 30
+
+    steps:
+      - task: GoTool@0
+        displayName: 'Use Go'
+        inputs:
+          version: $(GOVER)
+
+      - bash: |
+          go test -v ./...
+        displayName: 'Run Tests'
+
   - job: binary
     displayName: "binary build"
     pool:
@@ -88,8 +122,8 @@ jobs:
         inputs:
           ArtifactName: 'serial-bin-$(GOOS)-$(GOARCH)'
 
-  - job: debian_10
-    displayName: "packaging debian-bullseye"
+  - job: pkg_debian10_amd64
+    displayName: "packaging debian10-amd64"
     pool:
       vmImage: "ubuntu-latest"
     container:
@@ -126,8 +160,8 @@ jobs:
         inputs:
           ArtifactName: 'serial-pkg-debian10-amd64'
 
-  - job: archlinux
-    displayName: "packaging archlinux"
+  - job: pkg_archlinux_amd64
+    displayName: "packaging archlinux-amd64"
     pool:
       vmImage: "ubuntu-latest"
     container:
@@ -160,8 +194,8 @@ jobs:
         inputs:
           ArtifactName: 'serial-pkg-archlinux-amd64'
 
-  - job: fedora
-    displayName: "packaging fedora"
+  - job: pkg_fedora_amd64
+    displayName: "packaging fedora-amd64"
     pool:
       vmImage: "ubuntu-latest"
     container:
@@ -195,8 +229,8 @@ jobs:
         inputs:
           ArtifactName: 'serial-pkg-fedora-amd64'
 
-  - job: centos7
-    displayName: "packaging centos7"
+  - job: pkg_centos7_amd64
+    displayName: "packaging centos7-amd64"
     pool:
       vmImage: "ubuntu-latest"
     container:
