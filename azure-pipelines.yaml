@@ -216,7 +216,7 @@ jobs:
           sudo yum -y install epel-release
           sudo yum -y update
           sudo yum -y group install "Development Tools"
-          sudo yum -y install golang rpmdevtools
+          sudo yum -y install golang rpmdevtools systemd-rpm-macros
         displayName: 'Install Dependencies'
 
       - bash: |
