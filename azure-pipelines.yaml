@@ -76,7 +76,7 @@ jobs:
           export GOBIN="/opt/hostedtoolcache/go/${GOVER}/x64/bin"
           export OUT_FILE="serial-${GOOS}-${GOARCH}${FILENAME_SUFFIX}"
           bash ./contrib/build/build.sh
-          cp build/* ${BUILD_ARTIFACTSTAGINGDIRECTORY}
+          cp build/* "${BUILD_ARTIFACTSTAGINGDIRECTORY}"
         displayName: 'Build'
 
       - task: PublishBuildArtifacts@1
@@ -105,12 +105,28 @@ jobs:
       - bash: |
           export DEBIAN_FRONTEND=noninteractive
           sudo apt-get install -y devscripts equivs dh-make-golang
+          git config --global user.name "buildbot"
+          git config --global user.email "buildbot@example.com"
         displayName: 'Install Dependencies'
 
       - bash: |
-          git config --global user.name "buildbot"
-          git config --global user.email "buildbot@example.com"
+          pushd /tmp
+          for pkg in github.com/jszwec/csvutil go.bug.st/serial; do
+            rm -rf build || true
+            mkdir -p build
+            pushd build
+            dh-make-golang "$pkg"
+            pushd *
+            git commit -m "add debian packaging metadata"
+            gbp buildpackage --git-pbuilder
+            ls -alh . ..
+            popd
+            popd
+          done
+          popd
+        displayName: 'Build Dependencies'
 
+      - bash: |
           pushd /tmp
           dh-make-golang github.com/Jamesits/serial
           popd
@@ -119,7 +135,6 @@ jobs:
           cp -afv contrib/debian .
 
           mk-build-deps --root-cmd sudo --install --tool "apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends -y"
-          go mod download -x
           dpkg-buildpackage --build=binary --no-sign
 
           ls -alh . ..
@@ -138,19 +153,28 @@ jobs:
     steps:
       - bash: |
           /tmp/docker exec -t -u 0 ci-container \
-          sh -c "pacman -Syyu --noconfirm; pacman -S --noconfirm sudo"
+          sh -c "pacman -Syyu --noconfirm; pacman -S --noconfirm --needed sudo"
         displayName: 'Install sudo'
 
       - bash: |
-          sudo pacman -S --noconfirm pacman-contrib binutils go git upx base-devel
+          sudo pacman -S --noconfirm --needed pacman-contrib binutils go git upx base-devel
         displayName: 'Install Dependencies'
 
       - bash: |
+          set -Eeuo pipefail
+
           mkdir /tmp/archlinux
           tar -cvJf /tmp/archlinux/source.tar.xz .
           cp -rv contrib/archlinux/* /tmp/archlinux/
           cd /tmp/archlinux
           updpkgsums
+
           makepkg
-          ls -alh . ..
+
+          cp -afv /tmp/archlinux/*.pkg.* "${BUILD_ARTIFACTSTAGINGDIRECTORY}"
         displayName: 'Build'
+
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish Artifact'
+        inputs:
+          ArtifactName: 'serial-archlinux-amd64'
