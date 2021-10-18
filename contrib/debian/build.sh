@@ -6,6 +6,7 @@ cd -- "$( dirname -- "${BASH_SOURCE[0]}" )/../.."
 
 declare -a GO_MANUAL_DEPS=(
   "github.com/jszwec/csvutil"
+  "github.com/creack/goselect"
   "go.bug.st/serial"
 )
 
