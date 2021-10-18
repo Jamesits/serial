@@ -83,7 +83,7 @@ jobs:
       - task: PublishBuildArtifacts@1
         displayName: 'Publish Artifact'
         inputs:
-          ArtifactName: 'serial-$(GOOS)-$(GOARCH)'
+          ArtifactName: 'serial-bin-$(GOOS)-$(GOARCH)'
 
   - job: debian_10
     displayName: "packaging debian-bullseye"
@@ -119,7 +119,7 @@ jobs:
       - task: PublishBuildArtifacts@1
         displayName: 'Publish Artifact'
         inputs:
-          ArtifactName: 'serial-archlinux-amd64'
+          ArtifactName: 'serial-pkg-archlinux-amd64'
 
   - job: archlinux
     displayName: "packaging archlinux"
@@ -150,7 +150,7 @@ jobs:
       - task: PublishBuildArtifacts@1
         displayName: 'Publish Artifact'
         inputs:
-          ArtifactName: 'serial-archlinux-amd64'
+          ArtifactName: 'serial-pkg-archlinux-amd64'
 
   - job: fedora
     displayName: "packaging fedora"
@@ -182,4 +182,38 @@ jobs:
       - task: PublishBuildArtifacts@1
         displayName: 'Publish Artifact'
         inputs:
-          ArtifactName: 'serial-fedora-amd64'
+          ArtifactName: 'serial-pkg-fedora-amd64'
+
+  - job: centos7
+    displayName: "packaging centos7"
+    pool:
+      vmImage: "ubuntu-latest"
+    container:
+      image: "centos:7"
+      options: "--name ci-container -v /usr/bin/docker:/tmp/docker:ro"
+    workspace:
+      clean: all
+    timeoutInMinutes: 30
+
+    steps:
+      - bash: |
+          /tmp/docker exec -t -u 0 ci-container \
+          sh -c "yum -y update; yum -y install sudo"
+        displayName: 'Install sudo'
+
+      - bash: |
+          sudo yum -y install epel-release
+          sudo yum -y update
+          sudo yum -y group install "Development Tools"
+          sudo yum -y install golang rpmdevtools
+        displayName: 'Install Dependencies'
+
+      - bash: |
+          bash contrib/rpm/build.sh
+          cp "${HOME}/rpmbuild/RPMS/"**/* "${BUILD_ARTIFACTSTAGINGDIRECTORY}"
+        displayName: 'Build'
+
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish Artifact'
+        inputs:
+          ArtifactName: 'serial-pkg-centos7-amd64'
