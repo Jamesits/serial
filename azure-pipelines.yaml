@@ -107,6 +107,9 @@ jobs:
         displayName: 'Install Dependencies'
 
       - bash: |
+          git config --global user.name "buildbot"
+          git config --global user.email "buildbot@example.com"
+
           pushd /tmp
           dh-make-golang github.com/Jamesits/serial
           popd

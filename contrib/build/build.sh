@@ -8,10 +8,10 @@ cd "$( dirname "${BASH_SOURCE[0]}" )/../.."
 export GOPATH=${GOPATH:-/tmp/gopath}
 OUT_FILE=${OUT_FILE:-serial}
 
-export CGO_CPPFLAGS="${CPPFLAGS}"
-export CGO_CFLAGS="${CFLAGS}"
-export CGO_CXXFLAGS="${CXXFLAGS}"
-export CGO_LDFLAGS="${LDFLAGS}"
+export CGO_CPPFLAGS="${CPPFLAGS:-}"
+export CGO_CFLAGS="${CFLAGS:-}"
+export CGO_CXXFLAGS="${CXXFLAGS:-}"
+export CGO_LDFLAGS="${LDFLAGS:-}"
 
 GIT_COMMIT=$(git rev-list -1 HEAD | cut -c -8)
 CURRENT_TIME=$(date -u "+%Y-%m-%d %T UTC")
