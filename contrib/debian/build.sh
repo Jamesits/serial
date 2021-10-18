@@ -24,7 +24,7 @@ for pkg in "${GO_MANUAL_DEPS[@]}"; do
   pushd build
 
   # generate debian control files
-  dh-make-golang -allow_unknown_hoster "$pkg"
+  dh-make-golang -allow_unknown_hoster -type "library" "$pkg"
   pushd */
   # git add .
   # git commit -m "add debian packaging metadata"
