@@ -32,12 +32,14 @@ jobs:
           version: $(GOVER)
 
       - bash: |
-          go test -covermode=count -coverprofile=coverage.out -v ./...
+          go test -covermode=count -coverprofile=coverage.out -v ./... 2>&1 | tee report.out
         displayName: 'Run Tests'
 
       - bash: |
           go get github.com/t-yuki/gocover-cobertura
+          go get -u github.com/jstemmer/go-junit-report
           gocover-cobertura < coverage.out > coverage.xml
+          go-junit-report < report.out > report.xml
         displayName: 'Convert'
 
       - task: PublishCodeCoverageResults@1
@@ -45,6 +47,14 @@ jobs:
           codeCoverageTool: 'Cobertura'
           summaryFileLocation: 'coverage.xml'
           failIfCoverageEmpty: true
+
+      - task: PublishTestResults@2
+        inputs:
+          testResultsFormat: 'JUnit'
+          testResultsFiles: 'report.xml'
+          mergeTestResults: false
+          failTaskOnFailedTests: false
+          publishRunAttachments: true
 
   - job: unit_test_windows_amd64
     displayName: "unit test windows-amd64"
@@ -61,12 +71,14 @@ jobs:
           version: $(GOVER)
 
       - bash: |
-          go test -covermode=count -coverprofile=coverage.out -v ./...
+          go test -covermode=count -coverprofile=coverage.out -v ./... 2>&1 | tee report.out
         displayName: 'Run Tests'
 
       - bash: |
           go get github.com/t-yuki/gocover-cobertura
+          go get -u github.com/jstemmer/go-junit-report
           gocover-cobertura < coverage.out > coverage.xml
+          go-junit-report < report.out > report.xml
         displayName: 'Convert'
 
       - task: PublishCodeCoverageResults@1
@@ -74,6 +86,14 @@ jobs:
           codeCoverageTool: 'Cobertura'
           summaryFileLocation: 'coverage.xml'
           failIfCoverageEmpty: true
+
+      - task: PublishTestResults@2
+        inputs:
+          testResultsFormat: 'JUnit'
+          testResultsFiles: 'report.xml'
+          mergeTestResults: false
+          failTaskOnFailedTests: false
+          publishRunAttachments: true
 
   - job: unit_test_macos_amd64
     displayName: "unit test macos-amd64"
@@ -90,12 +110,14 @@ jobs:
           version: $(GOVER)
 
       - bash: |
-          go test -covermode=count -coverprofile=coverage.out -v ./...
+          go test -covermode=count -coverprofile=coverage.out -v ./... 2>&1 | tee report.out
         displayName: 'Run Tests'
 
       - bash: |
           go get github.com/t-yuki/gocover-cobertura
+          go get -u github.com/jstemmer/go-junit-report
           gocover-cobertura < coverage.out > coverage.xml
+          go-junit-report < report.out > report.xml
         displayName: 'Convert'
 
       - task: PublishCodeCoverageResults@1
@@ -103,6 +125,14 @@ jobs:
           codeCoverageTool: 'Cobertura'
           summaryFileLocation: 'coverage.xml'
           failIfCoverageEmpty: true
+
+      - task: PublishTestResults@2
+        inputs:
+          testResultsFormat: 'JUnit'
+          testResultsFiles: 'report.xml'
+          mergeTestResults: false
+          failTaskOnFailedTests: false
+          publishRunAttachments: true
 
   - job: binary
     displayName: "binary build"
