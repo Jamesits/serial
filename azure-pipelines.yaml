@@ -26,11 +26,11 @@ jobs:
     timeoutInMinutes: 30
     strategy:
       matrix:
-        linux:
+        linux-amd64:
           imageName: 'ubuntu-latest'
-        mac:
+        macos-amd64:
           imageName: 'macOS-latest'
-        windows:
+        windows-amd64:
           imageName: 'windows-latest'
 
     steps:
@@ -44,6 +44,7 @@ jobs:
         displayName: 'Run Tests'
 
       - bash: |
+          export PATH="${HOME}/go/bin:${PATH}"
           go install github.com/t-yuki/gocover-cobertura@latest && gocover-cobertura < coverage.out > coverage.xml
           go install github.com/jstemmer/go-junit-report@latest && go-junit-report < report.out > report.xml
         displayName: 'Convert'

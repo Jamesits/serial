@@ -100,14 +100,18 @@ go_unit_test:
   before_script:
     - !reference [ default, before_script ]
     - go install github.com/boumenot/gocover-cobertura@latest
+    - go install github.com/jstemmer/go-junit-report@latest # maybe try https://github.com/gotestyourself/gotestsum too
   script:
-    - go test -v -coverprofile="coverage.txt" -covermode count $(go list ./...) && RET=0 || RET=1
+    - go test -v -coverprofile="coverage.txt" -covermode count -v ./... 2>&1 | tee report.txt
+    - RET=${PIPESTATUS[0]}
     - gocover-cobertura < coverage.txt > coverage.xml
+    - go-junit-report < report.txt > report.xml
     - exit "$RET"
   artifacts:
     when: always
     reports:
       cobertura: coverage.xml
+      junit: report.xml
   allow_failure: false
 
 build:
