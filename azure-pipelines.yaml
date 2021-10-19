@@ -330,12 +330,13 @@ jobs:
         displayName: 'Install sudo'
 
       - bash: |
-          sudo yum -y remove --remove-leaves git || true
+
           sudo yum -y install epel-release
           sudo rpm -U https://repo.ius.io/ius-release-el7.rpm
           sudo yum -y update
-          sudo yum -y install git224 golang rpmdevtools systemd-rpm-macros
           sudo yum -y group install "Development Tools"
+          sudo yum -y remove --remove-leaves git || true
+          sudo yum -y install git224 golang rpmdevtools systemd-rpm-macros
         displayName: 'Install Dependencies'
 
       - bash: |
