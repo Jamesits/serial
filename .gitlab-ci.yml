@@ -224,13 +224,13 @@ package_centos7_amd64:
   image: "centos:7"
   before_script:
     - !reference [ default, before_script ]
-    - yum -y --remove-leaves remove git || true
+    - yum -y remove --remove-leaves git || true
     - yum -y update
     - yum -y install epel-release
     - rpm -U https://repo.ius.io/ius-release-el7.rpm
     - yum -y update
-    - yum -y group install "Development Tools"
     - yum -y install git224 golang rpmdevtools systemd-rpm-macros
+    - yum -y group install "Development Tools"
   script:
     - bash contrib/rpm/build.sh
     - mkdir -p build; cp -afv -- "${HOME}/rpmbuild/RPMS/"**/* build/
