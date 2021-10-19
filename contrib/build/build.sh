@@ -36,15 +36,15 @@ go build -mod=readonly -modcacherw -trimpath -ldflags "-s -w -X \"${VERSION_PKG}
 
 # strip
 if command -v strip; then
-  >&2 echo "[-] Stripping..."
-  strip --strip-unneeded "build/"*
+  >&2 echo "[*] Stripping..."
+  strip --strip-unneeded -- "build/"* && >&2 echo "[+] Strip succeeded." || >&2 echo "[-] Strip failed."
 else
   >&2 echo "[-] Stripping skipped."
 fi
 
 # upx
 if command -v upx; then
-	upx "build/"* && >&2 echo "[+] UPX succeeded." || >&2 echo "[-] UPX failed."
+	upx -- "build/"* && >&2 echo "[+] UPX succeeded." || >&2 echo "[-] UPX failed."
 else
 	>&2 echo "[-] UPX skipped."
 fi
