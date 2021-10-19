@@ -1,5 +1,4 @@
-//go:build darwin || linux
-// +build darwin linux
+// +build !windows
 
 // https://gist.github.com/EddieIvan01/4449b64fc1eb597ffc2f317cfa7cc70c
 // https://viewsourcecode.org/snaptoken/kilo/02.enteringRawMode.html
@@ -18,7 +17,7 @@ func getTermios(fd uintptr) *syscall.Termios {
 	_, _, err := syscall.Syscall6(
 		syscall.SYS_IOCTL,
 		os.Stdin.Fd(),
-		syscall.TCGETS,
+		IoctlReadTermios,
 		uintptr(unsafe.Pointer(&t)),
 		0, 0, 0)
 
@@ -33,7 +32,7 @@ func setTermios(fd uintptr, term *syscall.Termios) {
 	_, _, err := syscall.Syscall6(
 		syscall.SYS_IOCTL,
 		os.Stdin.Fd(),
-		syscall.TCSETS,
+		IoctlWriteTermios,
 		uintptr(unsafe.Pointer(term)),
 		0, 0, 0)
 	if err != 0 {
