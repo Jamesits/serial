@@ -25,6 +25,16 @@ jobs:
       clean: all
     timeoutInMinutes: 30
 
+    steps:
+      - task: GoTool@0
+        displayName: 'Use Go'
+        inputs:
+          version: $(GOVER)
+
+      - bash: |
+          go test -v ./...
+        displayName: 'Run Tests'
+        
   - job: unit_test_windows_amd64
     displayName: "unit test windows-amd64"
     pool:
@@ -32,6 +42,16 @@ jobs:
     workspace:
       clean: all
     timeoutInMinutes: 30
+
+    steps:
+      - task: GoTool@0
+        displayName: 'Use Go'
+        inputs:
+          version: $(GOVER)
+
+      - bash: |
+          go test -v ./...
+        displayName: 'Run Tests'
 
   - job: unit_test_macos_amd64
     displayName: "unit test macos-amd64"
