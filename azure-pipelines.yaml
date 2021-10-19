@@ -34,7 +34,7 @@ jobs:
       - bash: |
           go test -v ./...
         displayName: 'Run Tests'
-        
+
   - job: unit_test_windows_amd64
     displayName: "unit test windows-amd64"
     pool:
@@ -267,10 +267,10 @@ jobs:
         displayName: 'Install sudo'
 
       - bash: |
+          sudo yum -y --remove-leaves remove git || true
           sudo yum -y install epel-release
           sudo rpm -U https://repo.ius.io/ius-release-el7.rpm
           sudo yum -y update
-          sudo yum -y remove git
           sudo yum -y install git224
           sudo yum -y group install "Development Tools"
           sudo yum -y install golang rpmdevtools systemd-rpm-macros

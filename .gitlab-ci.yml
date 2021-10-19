@@ -14,6 +14,7 @@ stages:
   - build_prerequisities
   - unit_test
   - build_cmds
+  - packaging
 
 default:
   # tags:
@@ -76,6 +77,10 @@ go_mod_verify:
   stage: unit_test
   dependencies: [ ]
   needs: [ ]
+  only:
+    refs:
+      - branches
+      - tags
   script:
     - go mod vendor
     - go mod graph | tee go-mod-graph.txt
@@ -139,3 +144,93 @@ build:
         GOARCH: [ amd64, "386", arm64 ]
       - GOOS: darwin
         GOARCH: [ amd64, arm64 ]
+
+package_debian10_amd64:
+  stage: packaging
+  dependencies: [ ]
+  needs: [ ]
+  only:
+    refs:
+      - branches
+      - tags
+  image: "debian:bullseye-backports"
+  variables:
+    DEBIAN_FRONTEND: noninteractive
+  before_script:
+    - !reference [ default, before_script ]
+    - apt-get update -y
+    - apt-get install -y devscripts equivs dh-make-golang dh-golang golang-any socat upx
+    - git config --global user.name "buildbot"
+    - git config --global user.email "buildbot@example.com"
+  script:
+    - bash contrib/debian/build.sh
+    - mkdir -p build; cp -afv -- /tmp/artifacts/* build/
+  artifacts:
+    paths:
+      - "build/*"
+
+package_archlinux_amd64:
+  stage: packaging
+  dependencies: [ ]
+  needs: [ ]
+  only:
+    refs:
+      - branches
+      - tags
+  image: "archlinux:latest"
+  before_script:
+    - !reference [ default, before_script ]
+    - pacman -Syyu --noconfirm
+    - pacman -S --noconfirm --needed pacman-contrib binutils go git upx base-devel
+  script:
+    - bash contrib/archlinux/build.sh
+    - mkdir -p build; cp -afv -- /tmp/archlinux/*.pkg.* build/
+  artifacts:
+    paths:
+      - "build/*"
+
+package_fedora_amd64:
+  stage: packaging
+  dependencies: [ ]
+  needs: [ ]
+  only:
+    refs:
+      - branches
+      - tags
+  image: "fedora:latest"
+  before_script:
+    - !reference [ default, before_script ]
+    - dnf --assumeyes update
+    - dnf --assumeyes group install "Development Tools"
+    - dnf --assumeyes install go rpmdevtools
+  script:
+    - bash contrib/rpm/build.sh
+    - mkdir -p build; cp -afv -- "${HOME}/rpmbuild/RPMS/"**/* build/
+  artifacts:
+    paths:
+      - "build/*"
+
+package_centos7_amd64:
+  stage: packaging
+  dependencies: [ ]
+  needs: [ ]
+  only:
+    refs:
+      - branches
+      - tags
+  image: "centos:7"
+  before_script:
+    - !reference [ default, before_script ]
+    - yum -y --remove-leaves remove git || true
+    - yum -y update
+    - yum -y install epel-release
+    - rpm -U https://repo.ius.io/ius-release-el7.rpm
+    - yum -y update
+    - yum -y group install "Development Tools"
+    - yum -y install git224 golang rpmdevtools systemd-rpm-macros
+  script:
+    - bash contrib/rpm/build.sh
+    - mkdir -p build; cp -afv -- "${HOME}/rpmbuild/RPMS/"**/* build/
+  artifacts:
+    paths:
+      - "build/*"

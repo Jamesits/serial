@@ -1,5 +1,5 @@
 Name:           serial
-Version:        0.0.1
+Version:        0.0.0
 Release:        1%{?dist}
 Summary:        Serial is a modern command-line serial port tool designed with both humans and machines in mind.
 
