@@ -32,8 +32,19 @@ jobs:
           version: $(GOVER)
 
       - bash: |
-          go test -v ./...
+          go test -covermode=count -coverprofile=coverage.out -v ./...
         displayName: 'Run Tests'
+
+      - bash: |
+          go get github.com/t-yuki/gocover-cobertura
+          gocover-cobertura < coverage.out > coverage.xml
+        displayName: 'Convert'
+
+      - task: PublishCodeCoverageResults@1
+        inputs:
+          codeCoverageTool: 'Cobertura'
+          summaryFileLocation: 'coverage.xml'
+          failIfCoverageEmpty: true
 
   - job: unit_test_windows_amd64
     displayName: "unit test windows-amd64"
@@ -50,8 +61,19 @@ jobs:
           version: $(GOVER)
 
       - bash: |
-          go test -v ./...
+          go test -covermode=count -coverprofile=coverage.out -v ./...
         displayName: 'Run Tests'
+
+      - bash: |
+          go get github.com/t-yuki/gocover-cobertura
+          gocover-cobertura < coverage.out > coverage.xml
+        displayName: 'Convert'
+
+      - task: PublishCodeCoverageResults@1
+        inputs:
+          codeCoverageTool: 'Cobertura'
+          summaryFileLocation: 'coverage.xml'
+          failIfCoverageEmpty: true
 
   - job: unit_test_macos_amd64
     displayName: "unit test macos-amd64"
@@ -68,8 +90,19 @@ jobs:
           version: $(GOVER)
 
       - bash: |
-          go test -v ./...
+          go test -covermode=count -coverprofile=coverage.out -v ./...
         displayName: 'Run Tests'
+
+      - bash: |
+          go get github.com/t-yuki/gocover-cobertura
+          gocover-cobertura < coverage.out > coverage.xml
+        displayName: 'Convert'
+
+      - task: PublishCodeCoverageResults@1
+        inputs:
+          codeCoverageTool: 'Cobertura'
+          summaryFileLocation: 'coverage.xml'
+          failIfCoverageEmpty: true
 
   - job: binary
     displayName: "binary build"
