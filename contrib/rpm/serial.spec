@@ -25,8 +25,7 @@ bash contrib/build/build.sh
 install -Dpm 0755 build/%{name} %{buildroot}%{_bindir}/%{name}
 
 %check
-# go test should be here... :)
-true
+go test ./...
 
 #%post
 #%systemd_post %{name}.service

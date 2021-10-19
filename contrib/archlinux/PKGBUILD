@@ -22,8 +22,7 @@ build() {
 
 check() {
   # cd "$pkgname-$pkgver"
-  # go test ./...
-  true
+  go test ./...
 }
 
 package() {
