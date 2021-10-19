@@ -17,13 +17,21 @@ pr:
     exclude: [ "README.md", "LICENSE", ".github/*", "examples/*", ".golangci.yml", ".gitlab-ci.yml", ".idea/*", "doc/*" ]
 
 jobs:
-  - job: unit_test_linux_amd64
-    displayName: "unit test linux-amd64"
+  - job: unit_test
+    displayName: "unit test"
     pool:
-      vmImage: "ubuntu-latest"
+      vmImage: $(imageName)
     workspace:
       clean: all
     timeoutInMinutes: 30
+    strategy:
+      matrix:
+        linux:
+          imageName: 'ubuntu-latest'
+        mac:
+          imageName: 'macOS-latest'
+        windows:
+          imageName: 'windows-latest'
 
     steps:
       - task: GoTool@0
@@ -36,88 +44,8 @@ jobs:
         displayName: 'Run Tests'
 
       - bash: |
-          go get github.com/t-yuki/gocover-cobertura
-          go get -u github.com/jstemmer/go-junit-report
-          gocover-cobertura < coverage.out > coverage.xml
-          go-junit-report < report.out > report.xml
-        displayName: 'Convert'
-
-      - task: PublishCodeCoverageResults@1
-        inputs:
-          codeCoverageTool: 'Cobertura'
-          summaryFileLocation: 'coverage.xml'
-          failIfCoverageEmpty: true
-
-      - task: PublishTestResults@2
-        inputs:
-          testResultsFormat: 'JUnit'
-          testResultsFiles: 'report.xml'
-          mergeTestResults: false
-          failTaskOnFailedTests: false
-          publishRunAttachments: true
-
-  - job: unit_test_windows_amd64
-    displayName: "unit test windows-amd64"
-    pool:
-      vmImage: "windows-latest"
-    workspace:
-      clean: all
-    timeoutInMinutes: 30
-
-    steps:
-      - task: GoTool@0
-        displayName: 'Use Go'
-        inputs:
-          version: $(GOVER)
-
-      - bash: |
-          go test -covermode=count -coverprofile=coverage.out -v ./... 2>&1 | tee report.out
-        displayName: 'Run Tests'
-
-      - bash: |
-          go get github.com/t-yuki/gocover-cobertura
-          go get -u github.com/jstemmer/go-junit-report
-          gocover-cobertura < coverage.out > coverage.xml
-          go-junit-report < report.out > report.xml
-        displayName: 'Convert'
-
-      - task: PublishCodeCoverageResults@1
-        inputs:
-          codeCoverageTool: 'Cobertura'
-          summaryFileLocation: 'coverage.xml'
-          failIfCoverageEmpty: true
-
-      - task: PublishTestResults@2
-        inputs:
-          testResultsFormat: 'JUnit'
-          testResultsFiles: 'report.xml'
-          mergeTestResults: false
-          failTaskOnFailedTests: false
-          publishRunAttachments: true
-
-  - job: unit_test_macos_amd64
-    displayName: "unit test macos-amd64"
-    pool:
-      vmImage: "macos-latest"
-    workspace:
-      clean: all
-    timeoutInMinutes: 30
-
-    steps:
-      - task: GoTool@0
-        displayName: 'Use Go'
-        inputs:
-          version: $(GOVER)
-
-      - bash: |
-          go test -covermode=count -coverprofile=coverage.out -v ./... 2>&1 | tee report.out
-        displayName: 'Run Tests'
-
-      - bash: |
-          go get github.com/t-yuki/gocover-cobertura
-          go get -u github.com/jstemmer/go-junit-report
-          gocover-cobertura < coverage.out > coverage.xml
-          go-junit-report < report.out > report.xml
+          go install github.com/t-yuki/gocover-cobertura@latest && gocover-cobertura < coverage.out > coverage.xml
+          go install github.com/jstemmer/go-junit-report@latest && go-junit-report < report.out > report.xml
         displayName: 'Convert'
 
       - task: PublishCodeCoverageResults@1
@@ -330,13 +258,13 @@ jobs:
         displayName: 'Install sudo'
 
       - bash: |
-
           sudo yum -y install epel-release
           sudo rpm -U https://repo.ius.io/ius-release-el7.rpm
           sudo yum -y update
+          sudo yum -y install yum-plugin-remove-with-leaves
           sudo yum -y group install "Development Tools"
           sudo yum -y remove --remove-leaves git || true
-          sudo yum -y install git224 golang rpmdevtools systemd-rpm-macros
+          sudo yum -y install git224 golang rpmdevtools
         displayName: 'Install Dependencies'
 
       - bash: |
