@@ -1,6 +1,5 @@
 #!/bin/bash
 set -Eeuo pipefail
-set -x
 shopt -s globstar
 cd -- "$( dirname -- "${BASH_SOURCE[0]}" )/../.."
 
@@ -18,6 +17,7 @@ mkdir -p /tmp/artifacts
 
 pushd /tmp
 for pkg in "${GO_MANUAL_DEPS[@]}"; do
+  >&2 echo "[*] Building dependency package \"$pkg\"..."
   # setup build directory
   rm -rf build || true
   mkdir -p build
@@ -40,6 +40,7 @@ for pkg in "${GO_MANUAL_DEPS[@]}"; do
   find .. -type f -maxdepth 1 -exec cp -afv -- \{\} /tmp/artifacts \;
 
   # install artifacts
+  >&2 echo "[*] Installling dependency packages..."
   sudo dpkg -i ../*.deb
   sudo apt-get install -fy || true
   popd
@@ -49,6 +50,8 @@ popd
 
 # install artifacts
 # sudo dpkg -i /tmp/artifacts/*.deb
+
+>&2 echo "[*] Building..."
 
 # generate debian control files
 pushd /tmp
@@ -66,4 +69,7 @@ mk-build-deps --root-cmd sudo --install --tool "apt-get -o Debug::pkgProblemReso
 dpkg-buildpackage --build=binary --no-sign
 
 # collect artifacts
+>&2 echo "[*] Collecting artifacts..."
 find .. -type f -maxdepth 1 -exec cp -afv -- \{\} /tmp/artifacts \;
+
+>&2 echo "[+] Done."
