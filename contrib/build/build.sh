@@ -23,7 +23,6 @@ if command -v git > /dev/null; then
 fi
 
 mkdir -p build
-! mkdir -p "$GOPATH"
 
 export GO111MODULE=on
 >&2 echo "[*] Downloading dependencies..."

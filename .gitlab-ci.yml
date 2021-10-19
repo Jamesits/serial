@@ -181,9 +181,12 @@ package_archlinux_amd64:
   before_script:
     - !reference [ default, before_script ]
     - pacman -Syyu --noconfirm
-    - pacman -S --noconfirm --needed pacman-contrib binutils go git upx base-devel
+    - pacman -S --noconfirm --needed pacman-contrib binutils go git upx base-devel sudo
+    - useradd --create-home builder
+    - passwd -d builder
+    - "echo 'builder ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/builder"
   script:
-    - bash contrib/archlinux/build.sh
+    - sudo -u builder bash contrib/archlinux/build.sh
     - mkdir -p build; cp -afv -- /tmp/archlinux/*.pkg.* build/
   artifacts:
     paths:
