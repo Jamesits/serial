@@ -152,6 +152,7 @@ jobs:
           sh -c "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confold" -y install sudo"
         displayName: 'Install sudo'
 
+      # Note: socat is required for a unit test of a 3rd party dependency
       - bash: |
           export DEBIAN_FRONTEND=noninteractive
           sudo apt-get install -y devscripts equivs dh-make-golang dh-golang golang-any socat
@@ -190,7 +191,7 @@ jobs:
         displayName: 'Install sudo'
 
       - bash: |
-          sudo pacman -S --noconfirm --needed pacman-contrib binutils go git upx base-devel
+          sudo pacman -S --noconfirm --needed base-devel pacman-contrib binutils go git upx
         displayName: 'Install Dependencies'
 
       - bash: |
@@ -225,7 +226,7 @@ jobs:
 
       - bash: |
           sudo dnf --assumeyes group install "Development Tools"
-          sudo dnf --assumeyes install go rpmdevtools
+          sudo dnf --assumeyes install go rpmdevtools upx
         displayName: 'Install Dependencies'
 
       - bash: |
@@ -265,7 +266,7 @@ jobs:
           sudo yum -y install yum-plugin-remove-with-leaves
           sudo yum -y group install "Development Tools"
           sudo yum -y remove --remove-leaves git || true
-          sudo yum -y install git224 golang rpmdevtools
+          sudo yum -y install git224 golang rpmdevtools upx
         displayName: 'Install Dependencies'
 
       - bash: |

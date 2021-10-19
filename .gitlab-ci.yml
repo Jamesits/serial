@@ -163,6 +163,7 @@ package_debian10_amd64:
   before_script:
     - !reference [ default, before_script ]
     - apt-get update -y
+    # Note: socat is required for a unit test of a 3rd party dependency
     - apt-get install -y devscripts equivs dh-make-golang dh-golang golang-any socat upx
     - git config --global user.name "buildbot"
     - git config --global user.email "buildbot@example.com"
@@ -185,7 +186,7 @@ package_archlinux_amd64:
   before_script:
     - !reference [ default, before_script ]
     - pacman -Syyu --noconfirm
-    - pacman -S --noconfirm --needed pacman-contrib binutils go git upx base-devel sudo
+    - pacman -S --noconfirm --needed base-devel pacman-contrib binutils go git upx sudo
     - useradd --create-home builder
     - passwd -d builder
     - "echo 'builder ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/builder"
@@ -209,7 +210,7 @@ package_fedora_amd64:
     - !reference [ default, before_script ]
     - dnf --assumeyes update
     - dnf --assumeyes group install "Development Tools"
-    - dnf --assumeyes install go rpmdevtools
+    - dnf --assumeyes install go rpmdevtools upx
   script:
     - bash contrib/rpm/build.sh
     - mkdir -p build; cp -afv -- "${HOME}/rpmbuild/RPMS/"**/* build/
@@ -235,7 +236,7 @@ package_centos7_amd64:
     - yum -y install yum-plugin-remove-with-leaves
     - yum -y group install "Development Tools"
     - yum -y remove --remove-leaves git || true
-    - yum -y install git224 golang rpmdevtools
+    - yum -y install git224 golang rpmdevtools upx
   script:
     - bash contrib/rpm/build.sh
     - mkdir -p build; cp -afv -- "${HOME}/rpmbuild/RPMS/"**/* build/
