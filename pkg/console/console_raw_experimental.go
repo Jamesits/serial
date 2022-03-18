@@ -2,8 +2,8 @@ package console
 
 import (
 	"errors"
-	"github.com/Jamesits/serial/pkg/panic_helper"
 	"github.com/containerd/console"
+	"github.com/jamesits/libiferr/panicked"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh/terminal"
 )
@@ -52,7 +52,7 @@ func ConsoleRawExperimental() (in chan<- []byte, out <-chan []byte, err error) {
 			}
 		}
 
-		panic_helper.DoNotPanic(func() {
+		panicked.Catch(func() {
 			close(inChan)
 		})
 		log.Traceln("write process ended")
@@ -77,12 +77,12 @@ func ConsoleRawExperimental() (in chan<- []byte, out <-chan []byte, err error) {
 			outChan <- linebreak
 		}
 
-		panic_helper.DoNotPanic(func() {
+		panicked.Catch(func() {
 			close(outChan)
 		})
 
 		// FIXME: correctly signal inChan to close
-		panic_helper.DoNotPanic(func() {
+		panicked.Catch(func() {
 			close(inChan)
 		})
 

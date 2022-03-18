@@ -1,8 +1,8 @@
 package console
 
 import (
-	"github.com/Jamesits/serial/pkg/panic_helper"
 	"github.com/Jamesits/serial/pkg/raw_term"
+	"github.com/jamesits/libiferr/panicked"
 	log "github.com/sirupsen/logrus"
 	"os"
 )
@@ -12,7 +12,7 @@ func ConsoleRawSyscall() (in chan<- []byte, out <-chan []byte, err error) {
 	var outChan = make(chan []byte)
 
 	log.Traceln("term_raw_syscall setup")
-	err = panic_helper.DoNotPanic(func() {
+	err = panicked.CatchError(func() {
 		raw_term.SetRaw()
 	})
 	if err != nil {
@@ -21,7 +21,7 @@ func ConsoleRawSyscall() (in chan<- []byte, out <-chan []byte, err error) {
 
 	go func() {
 		log.Traceln("write process start")
-		defer panic_helper.DoNotPanic(func() {
+		defer panicked.Catch(func() {
 			close(inChan)
 		})
 
@@ -39,7 +39,7 @@ func ConsoleRawSyscall() (in chan<- []byte, out <-chan []byte, err error) {
 	go func() {
 		log.Traceln("read process start")
 		defer raw_term.Restore()
-		defer panic_helper.DoNotPanic(func() {
+		defer panicked.Catch(func() {
 			close(outChan)
 		})
 

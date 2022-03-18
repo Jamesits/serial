@@ -1,7 +1,7 @@
 package console
 
 import (
-	"github.com/Jamesits/serial/pkg/panic_helper"
+	"github.com/jamesits/libiferr/panicked"
 	log "github.com/sirupsen/logrus"
 	"os"
 )
@@ -12,7 +12,7 @@ func StdoutCooked(stdout *os.File) (in chan<- []byte, err error) {
 	var inChan = make(chan []byte)
 	go func() {
 		log.Debugln("write process start")
-		defer panic_helper.DoNotPanic(func() {
+		defer panicked.Catch(func() {
 			log.Debugln("closing write channel")
 			close(inChan)
 		})

@@ -1,15 +1,15 @@
 package console
 
 import (
-	"github.com/Jamesits/serial/pkg/panic_helper"
 	"github.com/Jamesits/serial/pkg/raw_term"
+	"github.com/jamesits/libiferr/panicked"
 	log "github.com/sirupsen/logrus"
 )
 
 // https://viewsourcecode.org/snaptoken/kilo/03.rawInputAndOutput.html
 func StdinRaw() (out <-chan []byte, err error) {
 	log.Debugln("stdin_raw setup")
-	err = panic_helper.DoNotPanic(func() {
+	err = panicked.CatchError(func() {
 		raw_term.SetRaw()
 	})
 	if err != nil {
@@ -20,7 +20,7 @@ func StdinRaw() (out <-chan []byte, err error) {
 	go func() {
 		log.Debugln("read process start")
 		defer raw_term.Restore()
-		defer panic_helper.DoNotPanic(func() {
+		defer panicked.Catch(func() {
 			log.Debugln("closing read channel")
 			close(outChan)
 		})

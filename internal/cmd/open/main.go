@@ -2,7 +2,7 @@ package open
 
 import (
 	"github.com/Jamesits/serial/pkg/console"
-	"github.com/Jamesits/serial/pkg/panic_helper"
+	"github.com/jamesits/libiferr/panicked"
 	"github.com/mattn/go-isatty"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -161,7 +161,7 @@ func main(cmd *cobra.Command, args []string) error {
 		}
 
 		log.Traceln("serial read process ended")
-		panic_helper.DoNotPanic(func() {
+		panicked.Catch(func() {
 			close(in)
 		})
 		mainThreadWaitGroup.Done()
@@ -186,7 +186,7 @@ func main(cmd *cobra.Command, args []string) error {
 		log.Traceln("serial write process ended")
 
 		// signal serial read process to quit
-		panic_helper.DoNotPanic(func() {
+		panicked.Catch(func() {
 			close(in)
 		})
 
