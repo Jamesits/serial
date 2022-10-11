@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/alessio/shellescape"
 	log "github.com/sirupsen/logrus"
+	"go.bug.st/serial"
 	"go.bug.st/serial/enumerator"
 	"os"
 	"os/exec"
@@ -12,11 +13,12 @@ import (
 )
 
 type serialPortDetail struct {
+	Available          bool   `json:"available" csv:"Available"`
 	Name               string `json:"name" csv:"Name"`
 	DisplayName        string `json:"display_name" csv:"Display Name"`
 	Path               string `json:"path" csv:"Path"`
 	PersistentName     string `json:"persistent_name" csv:"Persistent Name"`
-	IsUSB              bool   `json:"is_usb" csv:"Is USB?"`
+	Interface          string `json:"interface" csv:"Interface"`
 	PID                string `json:"pid,omitempty" csv:"PID"`
 	VID                string `json:"vid,omitempty" csv:"VID"`
 	DeviceSerialNumber string `json:"serial_number,omitempty" csv:"Serial Number"`
@@ -33,7 +35,7 @@ func getPortDetail() *[]serialPortDetail {
 		return nil
 	}
 
-	portDetail := []serialPortDetail{}
+	var portDetail []serialPortDetail
 
 	for _, port := range ports {
 		log.Tracef("reading port %s", port.Name)
@@ -63,18 +65,53 @@ func getPortDetail() *[]serialPortDetail {
 			displayName = port.Product
 		}
 
-		portDetail = append(portDetail, serialPortDetail{
+		d := serialPortDetail{
+			Available: true,
+
 			Name:           port.Name,
 			DisplayName:    displayName,
 			Path:           path,
 			PersistentName: persistentName,
 
 			// Note: if port is not from USB, you won't get PID & VID
-			IsUSB:              port.IsUSB,
 			PID:                port.PID,
 			VID:                port.VID,
 			DeviceSerialNumber: port.SerialNumber,
-		})
+		}
+		if port.IsUSB {
+			d.Interface = "USB"
+		} else {
+			d.Interface = ""
+		}
+
+		portDetail = append(portDetail, d)
+	}
+
+	// on Windows, there might be a reference to a COMx port in `HKEY_LOCAL_MACHINE\HARDWARE\DEVICEMAP\SERIALCOMM`, but
+	// no corresponding device available from SetupApi. We try to list theses too.
+	allPorts, err := serial.GetPortsList()
+	if err != nil {
+		log.WithError(err).Errorln("error getting serial port list")
+		return nil
+	}
+
+	for _, portName := range allPorts {
+		found := false
+
+		for _, port := range portDetail {
+			if port.Name == portName {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			portDetail = append(portDetail, serialPortDetail{
+				Available:   false,
+				Name:        portName,
+				DisplayName: portName,
+			})
+		}
 	}
 
 	return &portDetail

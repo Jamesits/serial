@@ -81,7 +81,7 @@ func formatTable() {
 			{
 				port.Path,
 				port.DisplayName,
-				ternaryString(port.IsUSB, "Yes", "No"),
+				port.Interface,
 				port.VID,
 				port.PID,
 				port.DeviceSerialNumber,
@@ -100,7 +100,7 @@ func formatTableWide() {
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.SetAllowedRowLength(getTerminalWidth())
-	t.AppendHeader(table.Row{"#", "Name", "Display Name", "Path", "Persistent Name", "USB?", "VID", "PID", "Serial Number"})
+	t.AppendHeader(table.Row{"#", "Name", "Display Name", "Path", "Persistent Name", "Interface", "VID", "PID", "Serial Number"})
 	for i, port := range p {
 		//t.AppendSeparator()
 		t.AppendRows([]table.Row{
@@ -110,7 +110,7 @@ func formatTableWide() {
 				port.DisplayName,
 				port.Path,
 				port.PersistentName,
-				ternaryString(port.IsUSB, "Yes", "No"),
+				port.Interface,
 				port.VID,
 				port.PID,
 				port.DeviceSerialNumber,

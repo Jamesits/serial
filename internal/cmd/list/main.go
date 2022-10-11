@@ -25,7 +25,7 @@ var configPrintSerializeDoNotPretty bool
 
 func init() {
 	CommandDefinition.PersistentFlags().BoolVar(&configPrint0, "print0", false, "Use '\\0' as the separator")
-	CommandDefinition.PersistentFlags().StringVar(&configPrintFormat, "format", "simple", "Print detailed information in the specified format (supported formats: table, json, csv)")
+	CommandDefinition.PersistentFlags().StringVar(&configPrintFormat, "format", "table", "Print detailed information in the specified format (supported formats: simple, table, json, csv)")
 	CommandDefinition.PersistentFlags().BoolVar(&configPrintSerializeWrapInObject, "json-wrap-in-object", false, "JSON: Wrap the array in an object (a compatibility option for some weak JSON parsers)")
 	CommandDefinition.PersistentFlags().BoolVar(&configPrintSerializeDoNotPretty, "json-do-not-pretty", false, "JSON: Do not pretty print")
 }
