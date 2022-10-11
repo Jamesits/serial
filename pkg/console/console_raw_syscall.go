@@ -12,7 +12,7 @@ func ConsoleRawSyscall() (in chan<- []byte, out <-chan []byte, err error) {
 	var outChan = make(chan []byte)
 
 	log.Traceln("term_raw_syscall setup")
-	err = panicked.CatchError(func() {
+	err, _ = panicked.CatchError(func() {
 		raw_term.SetRaw()
 	})
 	if err != nil {

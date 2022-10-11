@@ -9,7 +9,7 @@ import (
 // https://viewsourcecode.org/snaptoken/kilo/03.rawInputAndOutput.html
 func StdinRaw() (out <-chan []byte, err error) {
 	log.Debugln("stdin_raw setup")
-	err = panicked.CatchError(func() {
+	err, _ = panicked.CatchError(func() {
 		raw_term.SetRaw()
 	})
 	if err != nil {
